@@ -13,6 +13,8 @@ app.use(express.static('uploads'));
 connectDB(); 
 
 app.use('/api/products', require('./routes/productRoutes'));
+app.use('/api/menus', require('./routes/menuRoutes'));
+
 
 
 
