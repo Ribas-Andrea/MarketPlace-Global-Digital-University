@@ -1,0 +1,13 @@
+const express = require("express");
+const upload = require("../middleware/multer")
+const { getMenus, getMenu, createMenu, updateMenu, deleteMenu } = require("../controllers/menuController");
+const router = express.Router();
+
+router.get('/', getMenus); // Liste des menus
+router.get('/:id', getMenu); // Détail d'un menu
+router.post('/', upload.single('image'), createMenu); // Création d'un menu
+router.put('/:id', upload.single('image'), updateMenu); // Modification d'un menu
+router.delete('/:id', deleteMenu); // Suppression d'un menu
+
+
+module.exports = router; 
