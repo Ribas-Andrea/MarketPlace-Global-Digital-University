@@ -1,4 +1,4 @@
-const Product = require("../models/menu");
+const Menu = require("../models/menu");
 const mongoose = require('mongoose');
 const fs = require("fs");
 const path = require("path");
