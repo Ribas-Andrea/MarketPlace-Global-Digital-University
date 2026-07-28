@@ -1,5 +1,7 @@
 const Product = require("../models/product");
 const mongoose = require('mongoose');
+const fs = require("fs");
+const path = require("path");
 
 exports.getProducts = async (req, res) =>{
   try{
@@ -39,12 +41,18 @@ try {
   return res.status(400).json({ error: 'Image obligatoire' });
   }
 
-  if (!categorie)
-  return res.status(400).json({ error: 'Catégorie obligatoire' });
+  const dossier = `uploads/${categorie}`;
 
-  const image =  `${categorie}/${req.file.filename}`;
+  if (!fs.existsSync(dossier)) {
+  fs.mkdirSync(dossier, { recursive: true });
+  }
 
-  
+  const ancienChemin = req.file.path;
+  const nouveauChemin = path.join(dossier, req.file.filename);
+
+  fs.renameSync(ancienChemin, nouveauChemin);
+
+  const image = `${categorie}/${req.file.filename}`;
 
   if(!nom)
       return res.status(400).json({error: 'Nom obligatoire'});
@@ -72,10 +80,71 @@ try {
  
 }
 
-exports.modifyProducts = async (req, res) =>{
+exports.updateProduct = async (req, res) =>{
+try {
+  const { id } = req.params;
+  const {nom, prix, categorie} = req.body;
 
+  const product = await Product.findById(id);
+  if(!product){
+  return res.status(404).json({error: 'Produit non trouvé'});
+  }
+
+
+  let image;
+
+  if (req.file) {
+  image = `${categorie || product.categorie}/${req.file.filename}`;
+  }
+
+
+  // Les données modifiées : 
+  if(nom)
+      product.nom = nom;
+  if(prix)
+      product.prix = prix;
+
+  if(categorie)
+      product.categorie = categorie;
+
+  if(image)
+      product.image = image;
+
+  // On sauvegarde le produit : 
+
+  const updatedProduct = await product.save();
+  res.json(updatedProduct);
+
+} catch(err) {
+  console.error(err);
+  res.status(500).json({error: 'erreur lors de la modification'});
+}
 };
 
-exports.deleteProducts = async (req, res) =>{
+exports.deleteProduct = async (req, res) =>{
+try {
+  const { id } = req.params;
 
+  const product = await Product.findById(id);
+  if(!product){
+  return res.status(404).json({error: 'Produit non trouvé'});
+  }
+
+  const cheminImage = path.join("uploads", product.image);
+
+  if (fs.existsSync(cheminImage)) {
+    fs.unlinkSync(cheminImage);
+  }
+
+
+  // Les données modifiées : 
+  await product.deleteOne();
+  res.json({message: 'Projet supprimé avec succès'});
+
+
+
+} catch(err) {
+  console.error(err);
+  res.status(500).json({error: 'erreur lors de la suppression'});
+}
 };

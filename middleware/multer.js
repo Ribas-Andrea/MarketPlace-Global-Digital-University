@@ -4,8 +4,7 @@ const fs = require('fs'); // fs = fileSystem
 
 const storage = multer.diskStorage({
   destination: (req, file, callback) => {
-    const categorie = req.body.categorie || 'autres';
-    const chemin = `uploads/${categorie}`;
+    const chemin = `uploads/tempo`;
 
     if (!fs.existsSync(chemin)) {
       fs.mkdirSync(chemin, { recursive: true });
