@@ -60,6 +60,7 @@ try {
   fs.mkdirSync(dossier, { recursive: true });
   }
 
+
   const ancienChemin = req.file.path;
   const nouveauChemin = path.join(dossier, req.file.filename);
 
@@ -107,6 +108,11 @@ try {
   const savedMenu = await menu.save();
   res.status(201).json(savedMenu);
 } catch(err) {
+ // suppression des images de tempo en cas d'erreur pour éviter d'encombrer le dossier : 
+  if (req.file && fs.existsSync(req.file.path)) {
+    fs.unlinkSync(req.file.path);
+  }
+
   console.error(err);
   res.status(500).json({error: 'erreur lors de la création du menu'});
 }
