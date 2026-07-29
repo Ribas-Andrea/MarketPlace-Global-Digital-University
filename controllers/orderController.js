@@ -86,5 +86,28 @@ exports.updateOrder = async (req, res) =>{
 };
 
 exports.deleteOrder = async (req, res) =>{
+try {
 
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id))
+    return res.status(400).json({ error: 'ID invalide' });
+
+  
+  const order = await Order.findById(id);
+  if(!order){
+  return res.status(404).json({error: 'Commande non trouvée'});
+  }
+
+
+  // Les données modifiées : 
+  await order.deleteOne();
+  res.json({message: 'Commande supprimée avec succès'});
+
+
+
+} catch(err) {
+  console.error(err);
+  res.status(500).json({error: 'Erreur lors de la suppression de la commande'});
+}
 };
