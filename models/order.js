@@ -15,15 +15,15 @@ const articleSchema = new mongoose.Schema({
     type: Number,
     required: true,
     min: 1
+  },
+  totalArticle: {
+    type: Number,
+    default: 0
   }
 }, { _id: false });
 
 const orderSchema = new mongoose.Schema({
   articles: [articleSchema],
-  total: {
-    type: Number,
-    default: 0
-  }
 }, { timestamps: true });
 
 module.exports = mongoose.model("Order", orderSchema);
