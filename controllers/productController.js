@@ -35,7 +35,7 @@ exports.getProduct = async (req, res) => {
 
 exports.createProduct = async (req, res) => {
 try {
-  const {nom, prix, categorie} = req.body;
+  const {nom, prix, categorie, disponibilite} = req.body;
 
   if (!req.file) {
   return res.status(400).json({ error: 'Image obligatoire' });
@@ -60,7 +60,8 @@ try {
   if(!prix)
     return res.status(400).json({error: 'Prix obligatoire'});
 
-
+  if(!disponibilite)
+    return res.status(400).json({error: 'disponibilite obligatoire'});
 
   // On peut ajouter les droits de l'utilisateur ici selon son rôle
 
@@ -68,7 +69,8 @@ try {
     image,
     nom,
     prix,
-    categorie
+    categorie,
+    disponibilite
   });
 
   const savedProduct = await product.save();
@@ -83,7 +85,7 @@ try {
 exports.updateProduct = async (req, res) =>{
 try {
   const { id } = req.params;
-  const {nom, prix, categorie} = req.body;
+  const {nom, prix, categorie, disponibilite} = req.body;
 
   const product = await Product.findById(id);
   if(!product){
@@ -109,6 +111,9 @@ try {
 
   if(image)
       product.image = image;
+
+  if(disponibilite)
+      product.disponibilite = disponibilite;
 
   // On sauvegarde le produit : 
 
