@@ -3,14 +3,30 @@ const mongoose = require('mongoose');
 const fs = require("fs");
 const path = require("path");
 
-exports.getProducts = async (req, res) =>{
-  try{
-  const products = await Product
-  .find()
+exports.getProducts = async (req, res) => {
+  try {
+    const filtre = {};
 
-  res.status(200).json({products});
-  } catch(err) {
-      res.status(500).json([{error: 'Erreur lors de la récupération des produits' }]);
+    if (req.query.categorie) {
+      filtre.categorie = req.query.categorie;
+    }
+
+    if (req.query.disponible !== undefined) {
+      filtre.disponible = req.query.disponible === "true";
+    }
+
+
+// console.log(req.query);
+// console.log(filtre);
+
+
+    const products = await Product.find(filtre);
+
+    res.status(200).json({ products });
+  } catch (err) {
+    res.status(500).json({
+      error: "Erreur lors de la récupération des produits"
+    });
   }
 };
 
@@ -35,11 +51,14 @@ exports.getProduct = async (req, res) => {
 
 exports.createProduct = async (req, res) => {
 try {
-  const {nom, prix, categorie} = req.body;
+  const {nom, prix, categorie, disponible} = req.body;
 
   if (!req.file) {
   return res.status(400).json({ error: 'Image obligatoire' });
   }
+
+  if (!categorie)
+  return res.status(400).json({ error: 'Catégorie obligatoire' });
 
   const dossier = `uploads/${categorie}`;
 
@@ -60,7 +79,8 @@ try {
   if(!prix)
     return res.status(400).json({error: 'Prix obligatoire'});
 
-
+  if (disponible === undefined)
+  return res.status(400).json({ error: 'Disponibilité obligatoire' });
 
   // On peut ajouter les droits de l'utilisateur ici selon son rôle
 
@@ -68,22 +88,28 @@ try {
     image,
     nom,
     prix,
-    categorie
+    categorie,
+    disponible
   });
 
   const savedProduct = await product.save();
   res.status(201).json(savedProduct);
 } catch(err) {
   console.error(err);
-  res.status(500).json({error: 'erreur lors de la création'});
+  res.status(500).json({error: 'erreur lors de la création du produit'});
 }
  
 }
 
 exports.updateProduct = async (req, res) =>{
 try {
+
   const { id } = req.params;
-  const {nom, prix, categorie} = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(id))
+    return res.status(400).json({ error: 'ID invalide' });
+
+  const {nom, prix, categorie, disponible} = req.body;
 
   const product = await Product.findById(id);
   if(!product){
@@ -110,6 +136,9 @@ try {
   if(image)
       product.image = image;
 
+  if (disponible !== undefined)
+    product.disponible = disponible;
+
   // On sauvegarde le produit : 
 
   const updatedProduct = await product.save();
@@ -117,14 +146,19 @@ try {
 
 } catch(err) {
   console.error(err);
-  res.status(500).json({error: 'erreur lors de la modification'});
+  res.status(500).json({error: 'erreur lors de la modification du produit'});
 }
 };
 
 exports.deleteProduct = async (req, res) =>{
 try {
+
   const { id } = req.params;
 
+  if (!mongoose.Types.ObjectId.isValid(id))
+    return res.status(400).json({ error: 'ID invalide' });
+
+  
   const product = await Product.findById(id);
   if(!product){
   return res.status(404).json({error: 'Produit non trouvé'});
@@ -139,12 +173,12 @@ try {
 
   // Les données modifiées : 
   await product.deleteOne();
-  res.json({message: 'Projet supprimé avec succès'});
+  res.json({message: 'Produit supprimé avec succès'});
 
 
 
 } catch(err) {
   console.error(err);
-  res.status(500).json({error: 'erreur lors de la suppression'});
+  res.status(500).json({error: 'Erreur lors de la suppression du produit'});
 }
 };
