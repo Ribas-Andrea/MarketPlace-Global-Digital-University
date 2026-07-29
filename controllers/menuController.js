@@ -114,7 +114,71 @@ try {
 }
 
 exports.updateMenu = async (req, res) =>{
+try {
 
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id))
+    return res.status(400).json({ error: 'ID invalide' });
+
+  const {
+    nom, 
+    prix, 
+    categorie, 
+    disponible, 
+    taille,
+    accompagnement,
+    boisson,
+    sauce
+  } = req.body;
+
+  const menu = await Menu.findById(id);
+  if(!menu){
+  return res.status(404).json({error: 'Menu non trouvé'});
+  }
+
+  let imageBurger;
+
+  if (req.file) {
+  imageBurger = `${categorie || menu.categorie}/${req.file.filename}`;
+  }
+
+  // Les données modifiées : 
+  if(nom)
+      menu.nom = nom;
+  if(prix)
+      menu.prix = prix;
+
+  if(categorie)
+      menu.categorie = categorie;
+
+  if(imageBurger)
+      menu.imageBurger = imageBurger;
+
+  if (disponible !== undefined)
+    menu.disponible = disponible;
+
+  if(taille)
+      menu.taille = taille;
+
+  if(accompagnement)
+      menu.accompagnement = accompagnement;
+
+  if(boisson)
+      menu.boisson = boisson;
+
+  if(sauce)
+      menu.sauce = sauce;
+
+  // On sauvegarde le produit : 
+
+  const updatedMenu = await menu.save();
+  res.json(updatedMenu);
+
+  } catch(err) {
+    console.error(err);
+    res.status(500).json({error: 'erreur lors de la modification du menu'});
+  }
 };
 
 exports.deleteMenu = async (req, res) =>{
