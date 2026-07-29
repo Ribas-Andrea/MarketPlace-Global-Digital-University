@@ -82,7 +82,48 @@ exports.createOrder = async (req, res) => {
 }
 
 exports.updateOrder = async (req, res) =>{
+try {
 
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id))
+    return res.status(400).json({ error: 'ID invalide' });
+
+  const { type, id_element, quantite } = req.body;
+
+  const order = await Order.findById(id);
+  if(!order){
+  return res.status(404).json({error: 'Commande non trouvé'});
+  }
+
+  const article = order.articles.find(
+  a => a.id_element.toString() === id_element
+  );
+
+  if (!article) {
+    return res.status(404).json({
+      error: "Article non trouvé dans la commande"
+    });
+  }
+
+
+
+  // Les données modifiées : 
+  if(type)
+      article.type = type;
+
+  if(quantite!== undefined)
+      article.quantite = quantite;
+
+  // On sauvegarde le produit : 
+
+  const updatedOrder = await order.save();
+  res.json(updatedOrder);
+
+  } catch(err) {
+    console.error(err);
+    res.status(500).json({error: 'Erreur lors de la modification de la commande'});
+  }
 };
 
 exports.deleteOrder = async (req, res) =>{
