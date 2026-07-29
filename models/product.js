@@ -5,7 +5,7 @@ const productSchema = new mongoose.Schema({
   nom: {type: String, required: true},
   prix: {type: Number, required: true},
   categorie: {type: String, required: true},
-  disponibilite: {type: Boolean, required: true}
+  disponible: {type: Boolean, required: true}
 }, {timestamps: true});
 
 
