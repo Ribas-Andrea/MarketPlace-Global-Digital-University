@@ -78,16 +78,16 @@ try {
   return res.status(400).json({ error: 'Disponibilité obligatoire' });
 
   if (!taille)
-  return res.status(400).json({ error: 'Taille obligatoire obligatoire' });
+  return res.status(400).json({ error: 'Taille obligatoire' });
 
   if (!accompagnement)
-  return res.status(400).json({ error: 'Accompagnement obligatoire obligatoire' });
+  return res.status(400).json({ error: 'Accompagnement obligatoire' });
 
   if (!boisson)
-  return res.status(400).json({ error: 'Boisson obligatoire obligatoire' });
+  return res.status(400).json({ error: 'Boisson obligatoire' });
 
   if (!sauce)
-  return res.status(400).json({ error: 'Sauce obligatoire obligatoire' });
+  return res.status(400).json({ error: 'Sauce obligatoire' });
 
   // On peut ajouter les droits de l'utilisateur ici selon son rôle
 
@@ -114,7 +114,7 @@ try {
   }
 
   console.error(err);
-  res.status(500).json({error: 'erreur lors de la création du menu'});
+  res.status(500).json({error: 'Erreur lors de la création du menu'});
 }
  
 }
