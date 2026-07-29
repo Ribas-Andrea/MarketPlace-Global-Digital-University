@@ -173,12 +173,12 @@ try {
 
   // Les données modifiées : 
   await product.deleteOne();
-  res.json({message: 'Projet supprimé avec succès'});
+  res.json({message: 'Produit supprimé avec succès'});
 
 
 
 } catch(err) {
   console.error(err);
-  res.status(500).json({error: 'erreur lors de la suppression'});
+  res.status(500).json({error: 'Erreur lors de la suppression du produit'});
 }
 };

@@ -182,5 +182,34 @@ try {
 };
 
 exports.deleteMenu = async (req, res) =>{
+try {
 
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id))
+    return res.status(400).json({ error: 'ID invalide' });
+
+  
+  const menu = await Menu.findById(id);
+  if(!menu){
+  return res.status(404).json({error: 'Produit non trouvé'});
+  }
+
+  const cheminImageBurger = path.join("uploads", menu.imageBurger);
+
+  if (fs.existsSync(cheminImageBurger)) {
+    fs.unlinkSync(cheminImageBurger);
+  }
+
+
+  // Les données modifiées : 
+  await menu.deleteOne();
+  res.json({message: 'Menu supprimé avec succès'});
+
+
+
+} catch(err) {
+  console.error(err);
+  res.status(500).json({error: 'Erreur lors de la suppression du menu'});
+}
 };
