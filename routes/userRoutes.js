@@ -1,5 +1,5 @@
 const express = require("express");
-const { register, login } = require("../controllers/authController");
+const { register, login, deleteUser } = require("../controllers/authController");
 const router = express.Router();
 const {body} = require('express-validator');
 // const role = require('../middleware/role');
@@ -7,6 +7,7 @@ const {body} = require('express-validator');
 
 router.post('/', register); // Inscription
 router.post('/login', body('username').isEmail(), login); // Connexion
-// router.get('/login', role, getlogin);
+router.delete('/:id', deleteUser); // Supprimer un utilisateur
+
 
 module.exports = router; 

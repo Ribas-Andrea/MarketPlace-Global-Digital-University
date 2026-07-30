@@ -52,18 +52,19 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try{
-      const {username, password} = req.body;
-      if(!username || !password)
-        return res.status(400).json({message: 'Email et password obligatoire'});
+      const {username, password, role} = req.body;
+      if(!username || !password ||!role)
+        return res.status(400).json({message: 'Email, password et role obligatoire'});
 
       // on vérifie si l'utilisateur existe déjà : 
-      const existingUser = await User.findOne({ username });
+      const existingUser = await User.findOne({ username, role });
       if(!existingUser)
-        return res.status(400).json({message: 'Identifiant Ivalides'});
+        return res.status(400).json({message: 'Identifiant Invalides'});
 
       const isPasswordCorrect = await bcrypt.compare(password, existingUser.password)
       if(!isPasswordCorrect)
-        return res.status(400).json({message: 'Identifiant Ivalides'});
+        return res.status(400).json({message: 'Identifiant Invalides'});
+
 
       const token = jwt.sign(
       {userId: existingUser._id},
@@ -79,15 +80,34 @@ exports.login = async (req, res) => {
 }
 
 
-// exports.getlogin = async (req, res) => {
-//   try{
-//       const {role} = req.body;
-//       if(!role)
-//         return res.status(400).json({message: 'Role obligatoire'});
 
 
-//   } catch(err) {
-//   console.error(err);
-//   res.status(500).json({message: 'Erreur Serveur'});
-//   }
-// }
+
+
+exports.deleteUser = async (req, res) =>{
+try {
+
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id))
+    return res.status(400).json({ error: 'ID invalide' });
+
+  
+  const user = await User.findById(id);
+  if(!user){
+  return res.status(404).json({error: 'Utilisateur non trouvé'});
+  }
+
+ 
+
+  // Les données modifiées : 
+  await user.deleteOne();
+  res.json({message: 'Utilisateur supprimé avec succès'});
+
+
+
+} catch(err) {
+  console.error(err);
+  res.status(500).json({error: 'Erreur lors de la suppression de l\'utilisateur'});
+}
+};
