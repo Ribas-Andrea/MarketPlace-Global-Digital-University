@@ -4,8 +4,6 @@ const passwordValidator = require('password-validator'); // plugin de sécurité
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-
-
 exports.register = async (req, res) => {
   try{
     const {username, password, role} = req.body;
@@ -49,6 +47,44 @@ exports.register = async (req, res) => {
   }
 
 }
+
+exports.getUsers = async (req, res) => {
+  try {
+    const filtre = {};
+
+    if (req.query.role) {
+      filtre.role = req.query.role;
+    }
+
+    const users = await User.find(filtre);
+
+    res.status(200).json({ users });
+  } catch (err) {
+    res.status(500).json({
+      error: "Erreur lors de la récupération des utilisateurs"
+    });
+  }
+};
+
+exports.getUser = async (req, res) => {
+  try {
+
+    const { id } = req.params;
+
+    if(!mongoose.Types.ObjectId.isValid(id))
+        return res.status(400).json({error: 'ID invalide'});
+
+    const user = await User.findById(id);
+    if(!user)
+      return res.status(404).json({error: 'Utilisateur non trouvé'});
+
+    res.status(200).json({user});
+
+  } catch(err) {
+    res.status(500).json({ error: 'Erreur lors de la récupération de l\'utilisateur' });
+  }
+}
+
 
 exports.login = async (req, res) => {
   try{
@@ -128,7 +164,6 @@ if (role && !roles.includes(role)) {
   res.status(500).json({error: 'erreur lors de la modification de l\'utilisateur'});
 }
 };
-
 
 
 exports.deleteUser = async (req, res) =>{
