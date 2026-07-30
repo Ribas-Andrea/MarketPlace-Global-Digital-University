@@ -80,7 +80,54 @@ exports.login = async (req, res) => {
 }
 
 
+exports.updateUser = async (req, res) =>{
+try {
 
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id))
+    return res.status(400).json({ error: 'ID invalide' });
+
+  const {username, password, role} = req.body;
+
+
+  const user = await User.findById(id);
+  if(!user){
+  return res.status(404).json({error: 'Utilisateur non trouvé'});
+  }
+
+  if (req.body.username !== undefined) {
+  return res.status(403).json({
+    error: 'Modification du nom d\'utilisateur interdite'
+  });
+}
+
+
+  const roles = ['ADMINISTRATEUR','ACCUEIL', 'PREPARATEUR'];
+
+if (role && !roles.includes(role)) {
+    return res.status(400).json({
+        error: 'Rôle invalide'
+    });
+}
+
+  // Les données modifiées : 
+  if(password)
+      user.password = password;
+  if(role)
+      user.role = role;
+
+
+  // On sauvegarde l'utilisateur : 
+
+  const updatedUser = await user.save();
+  res.json(updatedUser);
+
+} catch(err) {
+  console.error(err);
+  res.status(500).json({error: 'erreur lors de la modification de l\'utilisateur'});
+}
+};
 
 
 
