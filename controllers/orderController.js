@@ -38,7 +38,10 @@ exports.getOrder = async (req, res) => {
 
 exports.createOrder = async (req, res) => {
   try {
-    const { type, id_element, quantite } = req.body;
+    let articles = [];
+for (let i=0; i<req.body.length ; i++) {
+
+      const { type, id_element, quantite } = req.body[i];
 
     let articlePanier;
 
@@ -62,15 +65,17 @@ exports.createOrder = async (req, res) => {
       (articlePanier.prix * quantite).toFixed(2)
     );
 
-    const order = new Order({
-      articles: [
-        {
+    articles.push({
           type,
           id_element,
           quantite,
           totalArticle
-        }
-      ]
+        })
+    }
+    
+
+    const order = new Order({
+      articles: articles
     });
 
     const savedOrder = await order.save();
