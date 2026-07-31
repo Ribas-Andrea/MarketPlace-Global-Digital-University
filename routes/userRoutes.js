@@ -8,7 +8,7 @@ const ROLES = require('../config/roles');
 
 router.post('/', register); // Inscription
 router.get('/', auth, roleCheck(ROLES.ADMIN), getUsers); // Récupérer la liste des utilisateurs
-router.get('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL), getUser); // Récupérer un utilisateur
+router.get('/:id', auth, roleCheck(ROLES.ADMIN), getUser); // Récupérer un utilisateur
 router.post('/login', body('username').isEmail(), login); // Connexion
 router.put('/:id', auth, roleCheck(ROLES.ADMIN), updateUser); // Modifier un utilisateur
 router.delete('/:id', auth, roleCheck(ROLES.ADMIN), deleteUser); // Supprimer un utilisateur
