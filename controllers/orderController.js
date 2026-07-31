@@ -136,7 +136,14 @@ try {
 };
 
 exports.updateOrderStatus = async (req, res) =>{
-
+  try {
+    req.order.status = req.body.status;
+    await req.order.save();
+    res.json(req.order);
+  } catch(err){
+    console.error(err);
+    res.status(500).json({ error: 'Erreur lors de la mise à jour du statut de la commande' });
+  }
 };
 
 

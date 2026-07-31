@@ -24,6 +24,11 @@ const articleSchema = new mongoose.Schema({
 
 const orderSchema = new mongoose.Schema({
   articles: [articleSchema],
+  status: {
+    type: String,
+    enum: ["brouillon", "en_attente", "preparee", "livree"],
+    default: "brouillon"
+  }
   //totalOrder = on sait combien le client a payer mais on ne connaitra pas le prix de l'article à la date de commande. 
 }, { timestamps: true });
 
