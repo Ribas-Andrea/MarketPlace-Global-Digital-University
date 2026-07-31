@@ -1,8 +1,15 @@
-const role = (req, res, next) => {
-  const administrateur = req.header('Authorization').split(' ')[1];
- 
-  if (!administrateur)
-    return res.status(401).json({message: 'Vous n\'êtes pas un administrateur'});
+const roleCheck = (...authRoles) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ message: 'Veuillez vous connecter' });
+    }
+
+    if (!authRoles.includes(req.user.role)) {
+      return res.status(403).json({ message: 'Accès non autorisé pour votre rôle' });
+    }
+
+    next()
+  }
 }
 
-module.exports = role;
+module.exports = roleCheck;

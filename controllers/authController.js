@@ -3,6 +3,9 @@ const mongoose = require('mongoose');
 const passwordValidator = require('password-validator'); // plugin de sécurité du mdp
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const ROLES = require('../config/roles');
+const roleCheck = require('../middleware/role');
+
 
 exports.register = async (req, res) => {
   try{
@@ -102,8 +105,12 @@ exports.login = async (req, res) => {
         return res.status(400).json({message: 'Identifiant Invalides'});
 
 
+
       const token = jwt.sign(
-      {userId: existingUser._id},
+      {
+        userId: existingUser._id,
+        role: existingUser.role
+      },
       process.env.JWT_SECRET, 
       {expiresIn: '7d'}
       );
@@ -139,17 +146,19 @@ try {
 }
 
 
-  const roles = ['ADMINISTRATEUR','ACCUEIL', 'PREPARATEUR'];
+const rolesValides = Object.values(ROLES); // ['administrateur', 'accueil', 'preparateur']
 
-if (role && !roles.includes(role)) {
-    return res.status(400).json({
-        error: 'Rôle invalide'
-    });
+if (role && !rolesValides.includes(role)) {
+  return res.status(400).json({ error: 'Rôle invalide' });
 }
 
   // Les données modifiées : 
+
+  // il faut hacher les mots de passe : 
+  const hashedPassword = await bcrypt.hash(password, 10);
+
   if(password)
-      user.password = password;
+      user.password = hashedPassword;
   if(role)
       user.role = role;
 
@@ -179,6 +188,11 @@ try {
   if(!user){
   return res.status(404).json({error: 'Utilisateur non trouvé'});
   }
+  
+if (user.id !== req.user.userId && req.user.role !== 'administrateur') {
+  return res.status(403).json({ message: "Oh le petit malin !!!" });
+}
+// ici seul l'administrateur peut supprimer un autre utilisateur
 
  
 
