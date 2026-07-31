@@ -7,11 +7,11 @@ const roleCheck = require('../middleware/role');
 const ROLES = require('../config/roles');
 
 
-router.get('/', getProducts); // Liste des projets
+router.get('/',  getProducts); // Liste des projets
 router.get('/:id', getProduct); // Détail d'un produit
-router.post('/', auth, upload.single('image'), createProduct); // Création d'un produit
-router.put('/:id', auth, upload.single('image'), updateProduct); // Modification d'un produit
-router.delete('/:id', auth, deleteProduct); // Suppression d'un produit
+router.post('/', auth,  roleCheck(ROLES.ADMIN), upload.single('image'), createProduct); // Création d'un produit
+router.put('/:id', auth,  roleCheck(ROLES.ADMIN), upload.single('image'), updateProduct); // Modification d'un produit
+router.delete('/:id', auth,  roleCheck(ROLES.ADMIN), deleteProduct); // Suppression d'un produit
 
 
 module.exports = router; 
