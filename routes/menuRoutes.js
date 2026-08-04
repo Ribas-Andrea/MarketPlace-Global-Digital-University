@@ -3,7 +3,7 @@ const upload = require("../middleware/multer")
 const { getMenus, getMenu, createMenu, updateMenu, deleteMenu } = require("../controllers/menuController");
 const router = express.Router();
 const auth = require('../middleware/auth');
-const roleCheck = require('../middleware/role');
+const roleCheck = require('../middleware/roleMiddleware');
 const ROLES = require('../config/roles');
 
 router.get('/', getMenus); // Liste des menus

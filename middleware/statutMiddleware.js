@@ -28,7 +28,7 @@ function canChangeOrderStatus(req, res, next) {
   const order = req.order;
   const { status: newStatus } = req.body;
 
-  if (role === 'admin') return next();
+  if (role === 'administrateur') return next();
 
   const rolePermissions = permissionsStatus[role];
   if (!rolePermissions) {
@@ -39,7 +39,7 @@ function canChangeOrderStatus(req, res, next) {
 
   if (!allowedTransitions.includes(newStatus)) {
     return res.status(403).json({
-      error: `Le rôle "${role}" ne peut pas faire passer une commande de "${order.status}" à "${newStatus}"`
+      error: `Le rôle '${role}' ne peut pas faire passer une commande de '${order.status}' à '${newStatus}'`
     });
   }
 

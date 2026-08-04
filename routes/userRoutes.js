@@ -3,7 +3,7 @@ const { register, login, deleteUser, updateUser, getUsers, getUser } = require("
 const router = express.Router();
 const {body} = require('express-validator');
 const auth = require('../middleware/auth');
-const roleCheck = require('../middleware/role');
+const roleCheck = require('../middleware/roleMiddleware');
 const ROLES = require('../config/roles');
 
 router.post('/', register); // Inscription

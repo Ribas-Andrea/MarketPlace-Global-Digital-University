@@ -4,7 +4,7 @@ const passwordValidator = require('password-validator'); // plugin de sécurité
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const ROLES = require('../config/roles');
-const roleCheck = require('../middleware/role');
+const roleCheck = require('../middleware/roleMiddleware');
 
 
 exports.register = async (req, res) => {

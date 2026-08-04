@@ -3,7 +3,7 @@ const upload = require("../middleware/multer")
 const { getProducts, getProduct, createProduct, updateProduct, deleteProduct } = require("../controllers/productcontroller");
 const router = express.Router();
 const auth = require('../middleware/auth');
-const roleCheck = require('../middleware/role');
+const roleCheck = require('../middleware/roleMiddleware');
 const ROLES = require('../config/roles');
 
 
