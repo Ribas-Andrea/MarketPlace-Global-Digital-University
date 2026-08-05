@@ -96,7 +96,7 @@ try {
   res.status(201).json(savedProduct);
 } catch(err) {
   console.error(err);
-  res.status(500).json({error: 'erreur lors de la création du produit'});
+  res.status(500).json({error: 'Erreur lors de la création du produit'});
 }
  
 }
@@ -146,7 +146,7 @@ try {
 
 } catch(err) {
   console.error(err);
-  res.status(500).json({error: 'erreur lors de la modification du produit'});
+  res.status(500).json({error: 'Erreur lors de la modification du produit'});
 }
 };
 

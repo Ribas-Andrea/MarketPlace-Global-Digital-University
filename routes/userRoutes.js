@@ -15,7 +15,7 @@ const ROLES = require('../config/roles');
  *    description: Gestion des utilisateurs
  */
 
-router.post('/', register); // Inscription
+
 /**
  * @swagger
  * /api/users:
@@ -56,9 +56,8 @@ router.post('/', register); // Inscription
  *         description: Authentification échouée(Email, password et role obligatoire) ou Mot de passe trop faible ou Compte déjà existant
  *       500: Erreur Serveur
 */
+router.post('/', register); // Inscription
 
-
-router.get('/', auth, roleCheck(ROLES.ADMIN), getUsers); // Récupérer la liste des utilisateurs
 /**
  * @swagger
  * /api/users:
@@ -95,9 +94,8 @@ router.get('/', auth, roleCheck(ROLES.ADMIN), getUsers); // Récupérer la liste
  *       500:
  *         description: Erreur lors de la récupération des utilisateurs
  */
+router.get('/', auth, roleCheck(ROLES.ADMIN), getUsers); // Récupérer la liste des utilisateurs
 
-
-router.get('/:id', auth, roleCheck(ROLES.ADMIN), getUser); // Récupérer un utilisateur
 /**
  * @swagger
  * /api/users/{id}:
@@ -143,9 +141,8 @@ router.get('/:id', auth, roleCheck(ROLES.ADMIN), getUser); // Récupérer un uti
  *       500:
  *         description: Erreur lors de la récupération de l'utilisateur
  */
+router.get('/:id', auth, roleCheck(ROLES.ADMIN), getUser); // Récupérer un utilisateur
 
-
-router.post('/login', body('username').isEmail(), login); // Connexion
 /**
  * @swagger
  * /api/users/login:
@@ -187,10 +184,8 @@ router.post('/login', body('username').isEmail(), login); // Connexion
  *       500: 
  *         description: Erreur Serveur
  */
+router.post('/login', body('username').isEmail(), login); // Connexion
 
-
-
-router.put('/:id', auth, roleCheck(ROLES.ADMIN), updateUser); // Modifier un utilisateur
 /**
  * @swagger
  * /api/users/{id}:
@@ -257,9 +252,8 @@ router.put('/:id', auth, roleCheck(ROLES.ADMIN), updateUser); // Modifier un uti
  *       500:
  *         description: Erreur lors de la modification de l'utilisateur
  */
+router.put('/:id', auth, roleCheck(ROLES.ADMIN), updateUser); // Modifier un utilisateur
 
-
-router.delete('/:id', auth, roleCheck(ROLES.ADMIN), deleteUser); // Supprimer un utilisateur
 /**
  * @swagger
  * /api/users/{id}:
@@ -287,6 +281,6 @@ router.delete('/:id', auth, roleCheck(ROLES.ADMIN), deleteUser); // Supprimer un
  *       500:
  *         description: Erreur lors de la suppression de l'utilisateur
  */
-
+router.delete('/:id', auth, roleCheck(ROLES.ADMIN), deleteUser); // Supprimer un utilisateur
 
 module.exports = router; 

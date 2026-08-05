@@ -189,9 +189,9 @@ try {
   return res.status(404).json({error: 'Utilisateur non trouvé'});
   }
   
-if (user.id !== req.user.userId && req.user.role !== 'administrateur') {
-  return res.status(403).json({ message: "Oh le petit malin !!!" });
-}
+  if (user.id !== req.user.userId && req.user.role !== 'administrateur') {
+    return res.status(403).json({ message: "Oh le petit malin !!!" });
+  }
 // ici seul l'administrateur peut supprimer un autre utilisateur
 
  
