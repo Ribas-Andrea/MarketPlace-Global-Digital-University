@@ -170,7 +170,7 @@ if (role && !rolesValides.includes(role)) {
 
 } catch(err) {
   console.error(err);
-  res.status(500).json({error: 'erreur lors de la modification de l\'utilisateur'});
+  res.status(500).json({error: 'Erreur lors de la modification de l\'utilisateur'});
 }
 };
 
