@@ -41,7 +41,6 @@ const ROLES = require('../config/roles');
  *                 format: password
  *               role:
  *                 type: string
- *                 format: string
  *     responses:
  *       200:
  *         description: Authentification réussie
@@ -50,12 +49,22 @@ const ROLES = require('../config/roles');
  *             schema:
  *               type: object
  *               properties:
- *                 token:
+ *                 username:
  *                   type: string
+ *                   format: email
+ *                 role:
+ *                   type: string
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                 updatedAt:
+ *                   type: string
+ *                   format: date-time
  *       400:
- *         description: Authentification échouée(Email, password et role obligatoire) ou Mot de passe trop faible ou Compte déjà existant
- *       500: Erreur Serveur
-*/
+ *         description: Authentification échouée (Email, password et rôle obligatoires, mot de passe trop faible ou compte déjà existant)
+ *       500:
+ *         description: Erreur serveur
+ */
 router.post('/', register); // Inscription
 
 /**
@@ -68,29 +77,31 @@ router.post('/', register); // Inscription
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Affichage des utilisateurs réussie
+ *         description: Affichage de la liste des utilisateurs réussie
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
- *                type: object
- *                properties:
- *                 _id:
- *                   type: string
- *                 username:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   username:
  *                     type: string
  *                     format: email
- *                 role:
+ *                   role:
  *                     type: string
- *                 createdAt:
- *                     type: string
- *                     format: date-time
- *                 updatedAt:
+ *                   createdAt:
  *                     type: string
  *                     format: date-time
- *                 token:
- *                   type: string
+ *                   updatedAt:
+ *                     type: string
+ *                     format: date-time
+ *                   token:
+ *                     type: string
+ *       403:
+ *         description: Accès non autorisé pour votre rôle
  *       500:
  *         description: Erreur lors de la récupération des utilisateurs
  */
@@ -113,29 +124,31 @@ router.get('/', auth, roleCheck(ROLES.ADMIN), getUsers); // Récupérer la liste
  *           type: string
  *     responses:
  *       200:
- *         description: Affichage des utilisateurs réussie
+ *         description: Affichage de l'utilisateur réussi
  *         content:
  *           application/json:
  *             schema:
- *                type: object
- *                properties:
+ *               type: object
+ *               properties:
  *                 _id:
  *                   type: string
  *                 username:
- *                     type: string
- *                     format: email
+ *                   type: string
+ *                   format: email
  *                 role:
- *                     type: string
+ *                   type: string
  *                 createdAt:
- *                     type: string
- *                     format: date-time
+ *                   type: string
+ *                   format: date-time
  *                 updatedAt:
- *                     type: string
- *                     format: date-time
+ *                   type: string
+ *                   format: date-time
  *                 token:
  *                   type: string
  *       400:
  *         description: ID invalide
+ *       403:
+ *         description: Accès non autorisé pour votre rôle
  *       404:
  *         description: Utilisateur non trouvé
  *       500:
@@ -168,7 +181,6 @@ router.get('/:id', auth, roleCheck(ROLES.ADMIN), getUser); // Récupérer un uti
  *                 format: password
  *               role:
  *                 type: string
- *                 format: string
  *     responses:
  *       200:
  *         description: Authentification réussie
@@ -181,6 +193,8 @@ router.get('/:id', auth, roleCheck(ROLES.ADMIN), getUser); // Récupérer un uti
  *                   type: string
  *       400:
  *         description: Email, password et role obligatoire ou Identifiant Invalides
+ *       403:
+ *         description: Accès non autorisé pour votre rôle
  *       500: 
  *         description: Erreur Serveur
  */
@@ -216,39 +230,38 @@ router.post('/login', body('username').isEmail(), login); // Connexion
  *                 format: password
  *               role:
  *                 type: string
- *                 format: string
  *     responses:
  *       200:
  *         description: Modification de l'utilisateur réussie
  *         content:
  *           application/json:
  *             schema:
- *                type: object
- *                properties:
+ *               type: object
+ *               properties:
  *                 _id:
  *                   type: string
  *                 username:
- *                     type: string
- *                     format: email
+ *                   type: string
+ *                   format: email
  *                 password:
- *                     type: string
- *                     format: password
+ *                   type: string
+ *                   format: password
  *                 role:
- *                     type: string
+ *                   type: string
  *                 createdAt:
- *                     type: string
- *                     format: date-time
+ *                   type: string
+ *                   format: date-time
  *                 updatedAt:
- *                     type: string
- *                     format: date-time
+ *                   type: string
+ *                   format: date-time
  *                 token:
  *                   type: string
  *       400:
- *         description: ID invalide ou Rôle invalide
+ *         description: ID invalide ou rôle invalide
+ *       403:
+ *         description: Modification du nom d'utilisateur interdite ou Accès non autorisé pour votre rôle
  *       404:
  *         description: Utilisateur non trouvé
- *       403:
- *         description: Modification du nom d'utilisateur interdite
  *       500:
  *         description: Erreur lors de la modification de l'utilisateur
  */
@@ -275,7 +288,7 @@ router.put('/:id', auth, roleCheck(ROLES.ADMIN), updateUser); // Modifier un uti
  *       400:
  *         description: ID invalide
  *       403:
- *         description: Modification du nom d'utilisateur interdite(Oh le petit malin !!!)
+ *         description: Modification du nom d'utilisateur interdite(Oh le petit malin !!!) ou Accès non autorisé pour votre rôle
  *       404:
  *         description: Utilisateur non trouvé
  *       500:

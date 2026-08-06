@@ -151,6 +151,8 @@ router.get('/:id', getProduct); // Détail d'un produit
  *              description: Nom obligatoire ou image obligatoire ou Catégorie obligatoire ou Prix obligatoire ou Disponibilité obligatoire
  *          401:
  *              description: Token obligatoire
+ *          403:
+ *              description: Accès non autorisé pour votre rôle
  *          500:
  *              description: Erreur lors de la création du produit
  */
@@ -177,12 +179,6 @@ router.post('/', auth,  roleCheck(ROLES.ADMIN), upload.single('image'), createPr
  *          multipart/form-data:
  *            schema:
  *              type: object
- *              required:
- *                  -nom
- *                  -image
- *                  -prix
- *                  -categorie
- *                  -disponible
  *              properties:
  *                  image:
  *                    type: string
@@ -226,6 +222,8 @@ router.post('/', auth,  roleCheck(ROLES.ADMIN), upload.single('image'), createPr
  *              description: ID invalide
  *          401:
  *              description: Token obligatoire
+ *          403:
+ *              description: Accès non autorisé pour votre rôle
  *          404:
  *              description: Produit non trouvé
  *          500:
@@ -254,7 +252,7 @@ router.put('/:id', auth,  roleCheck(ROLES.ADMIN), upload.single('image'), update
  *       400:
  *         description: ID invalide
  *       403:
- *         description: Suppression du produit interdite(Oh le petit malin !!!)
+ *         description: Suppression du produit interdite(Oh le petit malin !!!) ou Accès non autorisé pour votre rôle
  *       404:
  *         description: Produit non trouvé
  *       500:
