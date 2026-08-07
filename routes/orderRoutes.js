@@ -148,7 +148,7 @@ router.get('/:id', auth, getOrder); // Détail d'une commande
  *          500:
  *              description: Erreur lors de la création de la commande
  */
-router.post('/', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL), upload.none(),createOrder); // Création d'une commande
+router.post('/', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), upload.none(),createOrder); // Création d'une commande
 
 /**
  * @swagger
@@ -195,7 +195,7 @@ router.post('/', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL), upload.none(),crea
  *          500:
  *              description: Erreur lors de la modification de la commande
  */
-router.put('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL), upload.none(), updateOrder); // Modification d'une commande
+router.put('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), upload.none(), updateOrder); // Modification d'une commande
 
 /**
  * @swagger
@@ -226,7 +226,7 @@ router.put('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL), upload.none(), u
  *          500:
  *              description: Erreur lors de la suppression de la commande
  */
-router.delete('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL), deleteOrder); // Suppression d'une commande
+router.delete('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), deleteOrder); // Suppression d'une commande
 
 /**
  * @swagger
