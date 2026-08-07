@@ -170,7 +170,7 @@ if (role && !rolesValides.includes(role)) {
 
 } catch(err) {
   console.error(err);
-  res.status(500).json({error: 'erreur lors de la modification de l\'utilisateur'});
+  res.status(500).json({error: 'Erreur lors de la modification de l\'utilisateur'});
 }
 };
 
@@ -189,9 +189,9 @@ try {
   return res.status(404).json({error: 'Utilisateur non trouvé'});
   }
   
-if (user.id !== req.user.userId && req.user.role !== 'administrateur') {
-  return res.status(403).json({ message: "Oh le petit malin !!!" });
-}
+  if (user.id !== req.user.userId && req.user.role !== 'administrateur') {
+    return res.status(403).json({ message: "Oh le petit malin !!!" });
+  }
 // ici seul l'administrateur peut supprimer un autre utilisateur
 
  

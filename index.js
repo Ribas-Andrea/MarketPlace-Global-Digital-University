@@ -7,6 +7,7 @@ const rateLimit = require('express-rate-limit');
 
 
 const app = express();
+const setupSwagger = require('./swaggerConfig');
 app.use(helmet());
 app.use(cors());
 app.use(rateLimit({
@@ -24,9 +25,10 @@ app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/menus', require('./routes/menuRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/docs', require('./swaggerConfig'));
 
 
-
+setupSwagger(app);
 
 app.listen(3000, () => console.log('Serveur running'));
 

@@ -89,8 +89,6 @@ try {
   if (!sauce)
   return res.status(400).json({ error: 'Sauce obligatoire' });
 
-  // On peut ajouter les droits de l'utilisateur ici selon son rôle
-
   const menu = new Menu({
     imageBurger,
     nom,
