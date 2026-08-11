@@ -19,7 +19,10 @@ app.use(express.json());
 
 app.use(express.static('uploads'));
 
-connectDB(); 
+// Connexion à MongoDB uniquement hors environnement de test
+if (process.env.NODE_ENV !== 'test') {
+  connectDB();
+}
 
 app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/menus', require('./routes/menuRoutes'));
@@ -30,8 +33,12 @@ app.use('/api/docs', require('./swaggerConfig'));
 
 setupSwagger(app);
 
-app.listen(3000, () => console.log('Serveur running'));
+// Démarrage du serveur uniquement hors environnement de test
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(3000, () => console.log('Serveur running'));
+}
 
+module.exports = app;
 
 
 // Routes que l'on va avoir besoin : 
