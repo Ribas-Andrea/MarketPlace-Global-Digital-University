@@ -59,11 +59,11 @@ describe('DELETE /menus/:id', () => {
       // on s'attend à ce que le statuts de la réponse soit : 
       expect(menuResponse.statusCode).toBe(201);
 
-      const menutId = menuResponse.body._id;
+      const menuId = menuResponse.body._id;
 
       // Supression du produit
       const response = await request(app)
-        .delete('/api/MENUS/' + menutId)
+        .delete('/api/menus/' + menuId)
         .set('Authorization', 'Bearer token');
 
         console.log(response.body);
