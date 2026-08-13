@@ -87,6 +87,8 @@ describe('POST /orders', () => {
   .post('/api/orders') 
   .set('Authorization', 'Bearer token'); 
 
+  console.log(orderResponse.body);
+
   expect(orderResponse.statusCode).toBe(403);
   
   });

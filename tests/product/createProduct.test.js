@@ -34,7 +34,6 @@ afterAll(async() => {
 });
 
 
-
 describe('POST /products', () => {
 
   // ADMIN
@@ -51,14 +50,14 @@ describe('POST /products', () => {
 
       console.log(productResponse.body);
 
-        // on s'attend à ce que le statuts de la réponse soit : 
-        expect(productResponse.statusCode).toBe(201);
-        // on vérifie le produit : 
-        expect(productResponse.body.nom).toBe('Mon produit');
-        expect(productResponse.body.prix).toBe(8.8);
-        expect(productResponse.body.categorie).toBe('burgers');
-        expect(productResponse.body.disponible).toBe(true);
-        expect(productResponse.body.image).toBeDefined();
+      // on s'attend à ce que le statuts de la réponse soit : 
+      expect(productResponse.statusCode).toBe(201);
+      // on vérifie le produit : 
+      expect(productResponse.body.nom).toBe('Mon produit');
+      expect(productResponse.body.prix).toBe(8.8);
+      expect(productResponse.body.categorie).toBe('burgers');
+      expect(productResponse.body.disponible).toBe(true);
+      expect(productResponse.body.image).toBeDefined();
   });
 
   // ACCUEIL
@@ -68,6 +67,8 @@ describe('POST /products', () => {
   const productResponse = await request(app) 
   .post('/api/products') 
   .set('Authorization', 'Bearer token'); 
+
+  console.log(productResponse.body);
 
   expect(productResponse.statusCode).toBe(403);
   
@@ -79,6 +80,8 @@ describe('POST /products', () => {
   const productResponse = await request(app) 
   .post('/api/products') 
   .set('Authorization', 'Bearer token'); 
+
+  console.log(productResponse.body);
 
   expect(productResponse.statusCode).toBe(403);
   

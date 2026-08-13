@@ -35,75 +35,77 @@ afterAll(async() => {
   await mongoServer.stop();
 });
 
-
 describe('DELETE /products/:id', () => {
-  // ADMIN
-  it('Un administrateur peut supprimer un produit', async() => {
+
+  let productId;
+
+  beforeEach(async () => {
     mockCurrentRole = 'administrateur';
-    // création du produit
+
     const productResponse = await request(app)
       .post('/api/products')
-      .field('nom', 'Mon produit')
+      .field('nom', 'Produit test')
       .field('prix', '8.8')
       .field('categorie', 'burgers')
       .field('disponible', 'true')
       .attach('image', 'tests/imagesTest/BIGMAC.png')
       .set('Authorization', 'Bearer token');
 
-      console.log(productResponse.body);
+    console.log(productResponse.body);
+    expect(productResponse.statusCode).toBe(201);
 
-      // on s'attend à ce que le statuts de la réponse soit : 
-      expect(productResponse.statusCode).toBe(201);
-
-      const productId = productResponse.body._id;
-
-      // Supression du produit
-      const response = await request(app)
-        .delete('/api/products/' + productId)
-        .set('Authorization', 'Bearer token');
-
-        console.log(response.body);
-
-        // on vérifie la réponse : 
-        expect(response.statusCode).toBe(200);
+    productId = productResponse.body._id;
   });
 
-    // ACCUEIL
-  it('Un membre de l’accueil ne peut pas supprimer un produit', async() => {
+  // ADMINISTRATEUR
+  it('Un administrateur peut supprimer un produit', async () => {
+    mockCurrentRole = 'administrateur';
+
+    const response = await request(app)
+      .delete(`/api/products/${productId}`)
+      .set('Authorization', 'Bearer token');
+
+    console.log(response.body);
+
+    expect(response.statusCode).toBe(200);
+  });
+
+  // ACCUEIL
+  it("Un membre de l'accueil ne peut pas supprimer un produit", async () => {
     mockCurrentRole = 'accueil';
 
-  const response = await request(app) 
-  .delete('/api/products/:id') 
-  .set('Authorization', 'Bearer token'); 
+    const response = await request(app)
+      .delete(`/api/products/${productId}`)
+      .set('Authorization', 'Bearer token');
 
-  expect(response.statusCode).toBe(403);
-  
+    console.log(response.body);
+
+    expect(response.statusCode).toBe(403);
   });
+
   // PREPARATEUR
-  it('Un préparateur ne peut pas supprimer un produit', async() => {
+  it('Un préparateur ne peut pas supprimer un produit', async () => {
     mockCurrentRole = 'preparateur';
 
-  const response = await request(app) 
-  .delete('/api/products/:id')  
-  .set('Authorization', 'Bearer token'); 
+    const response = await request(app)
+      .delete(`/api/products/${productId}`)
+      .set('Authorization', 'Bearer token');
 
-  expect(response.statusCode).toBe(403);
-  
+    console.log(response.body);
+
+    expect(response.statusCode).toBe(403);
   });
 
   // CLIENT
-  it('Un client ne peut pas supprimer un produit', async() => {
+  it('Un client ne peut pas supprimer un produit', async () => {
     mockCurrentRole = 'client';
 
-  const response = await request(app) 
-  .delete('/api/products/:id') 
-  .set('Authorization', 'Bearer token'); 
+    const response = await request(app)
+      .delete(`/api/products/${productId}`)
+      .set('Authorization', 'Bearer token');
 
-  console.log(response.body);
+    console.log(response.body);
 
-  expect(response.statusCode).toBe(403);
-  
+    expect(response.statusCode).toBe(403);
   });
-
 });
-

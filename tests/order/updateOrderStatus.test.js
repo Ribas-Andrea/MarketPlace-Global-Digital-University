@@ -113,6 +113,8 @@ beforeEach(async () => {
       status: 'en_attente',
     });
 
+  console.log(orderResponse.body);
+
   expect(orderResponse.statusCode).toBe(200);
 
   // on vérifie la commande :
@@ -130,6 +132,8 @@ beforeEach(async () => {
     .send({
       status: 'en_attente',
     });
+
+  console.log(orderResponse.body);
 
   expect(orderResponse.statusCode).toBe(403);
   });
@@ -188,6 +192,8 @@ beforeEach(async () => {
       status: 'preparee',
     });
 
+  console.log(orderResponse.body);
+
   expect(orderResponse.statusCode).toBe(403);
   });
 
@@ -201,6 +207,8 @@ beforeEach(async () => {
     .send({
       status: 'preparee',
     });
+
+  console.log(orderResponse.body);
 
   expect(orderResponse.statusCode).toBe(200);
 
@@ -262,6 +270,8 @@ beforeEach(async () => {
       status: 'livree',
     });
 
+  console.log(orderResponse.body);
+
   expect(orderResponse.statusCode).toBe(200);
 
   // on vérifie la commande :
@@ -279,6 +289,8 @@ beforeEach(async () => {
     .send({
       status: 'livree',
     });
+
+  console.log(orderResponse.body);
 
   expect(orderResponse.statusCode).toBe(403);
   });

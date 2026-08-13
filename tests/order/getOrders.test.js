@@ -128,65 +128,54 @@ describe('GET /orders', () => {
    it(`Un ${role} peut afficher la liste des commandes`, async () => {
       mockCurrentRole = role;
       // Récupération des commandes
-      const ordersResponse = await request(app)
+      const orderResponse = await request(app)
         .get('/api/orders')
         .set('Authorization', 'Bearer token');
 
-      console.log("body", ordersResponse.body);
-      console.log("orders", ordersResponse.body.orders);
-      console.log("orders_0", ordersResponse.body.orders[0]);
-      console.log("orders_0_articles", ordersResponse.body.orders[0].articles);
-      console.log("orders_0_articles_0", ordersResponse.body.orders[0].articles[0]);
-      console.log(
-  ordersResponse.body.orders.map((order) => ({
-    id: order._id,
-    createdAt: order.createdAt,
-    firstArticle: order.articles[0].id_element
-  }))
-);
+      console.log("body", orderResponse.body);
       // On vérifie la réponse
-      expect(ordersResponse.statusCode).toBe(200);
+      expect(orderResponse.statusCode).toBe(200);
 
       // On vérifie qu'il y a bien 3 commandes
-      expect(ordersResponse.body.orders).toHaveLength(3);
+      expect(orderResponse.body.orders).toHaveLength(3);
 
       
       // on vérifie les commandes : 
 
       // Ma première commadne
-        expect(ordersResponse.body.orders[0].articles[0].type).toBe('Product');
-        expect(ordersResponse.body.orders[0].articles[0].id_element).toBe('6a6b442e279ded257bfe5c10');
-        expect(ordersResponse.body.orders[0].articles[0].quantite).toBe(1);
-        expect(ordersResponse.body.orders[0].articles[0].totalArticle).toBe(8.6);
-        expect(ordersResponse.body.orders[0].status).toBe('brouillon');
+        expect(orderResponse.body.orders[0].articles[0].type).toBe('Product');
+        expect(orderResponse.body.orders[0].articles[0].id_element).toBe('6a6b442e279ded257bfe5c10');
+        expect(orderResponse.body.orders[0].articles[0].quantite).toBe(1);
+        expect(orderResponse.body.orders[0].articles[0].totalArticle).toBe(8.6);
+        expect(orderResponse.body.orders[0].status).toBe('brouillon');
 
       // Ma deuxième commande
       // article 1 : produit
-        expect(ordersResponse.body.orders[1].articles[0].type).toBe('Product');
-        expect(ordersResponse.body.orders[1].articles[0].id_element).toBe('6a6b442e279ded257bfe5c20');
-        expect(ordersResponse.body.orders[1].articles[0].quantite).toBe(2);
-        expect(ordersResponse.body.orders[1].articles[0].totalArticle).toBe(4.8);
+        expect(orderResponse.body.orders[1].articles[0].type).toBe('Product');
+        expect(orderResponse.body.orders[1].articles[0].id_element).toBe('6a6b442e279ded257bfe5c20');
+        expect(orderResponse.body.orders[1].articles[0].quantite).toBe(2);
+        expect(orderResponse.body.orders[1].articles[0].totalArticle).toBe(4.8);
       // article 2 : produit
-        expect(ordersResponse.body.orders[1].articles[1].type).toBe('Product');
-        expect(ordersResponse.body.orders[1].articles[1].id_element).toBe('6a6b442e279ded257bfe5c30');
-        expect(ordersResponse.body.orders[1].articles[1].quantite).toBe(2);
-        expect(ordersResponse.body.orders[1].articles[1].totalArticle).toBe(10.8);
+        expect(orderResponse.body.orders[1].articles[1].type).toBe('Product');
+        expect(orderResponse.body.orders[1].articles[1].id_element).toBe('6a6b442e279ded257bfe5c30');
+        expect(orderResponse.body.orders[1].articles[1].quantite).toBe(2);
+        expect(orderResponse.body.orders[1].articles[1].totalArticle).toBe(10.8);
       // Status de la deuxième commande
-        expect(ordersResponse.body.orders[1].status).toBe('brouillon');
+        expect(orderResponse.body.orders[1].status).toBe('brouillon');
 
       // Ma troisième commande
       // article 1 : produit 
-        expect(ordersResponse.body.orders[2].articles[0].type).toBe('Product');
-        expect(ordersResponse.body.orders[2].articles[0].id_element).toBe('6a6b442e279ded257bfe5c30');
-        expect(ordersResponse.body.orders[2].articles[0].quantite).toBe(2);
-        expect(ordersResponse.body.orders[2].articles[0].totalArticle).toBe(10.8);
+        expect(orderResponse.body.orders[2].articles[0].type).toBe('Product');
+        expect(orderResponse.body.orders[2].articles[0].id_element).toBe('6a6b442e279ded257bfe5c30');
+        expect(orderResponse.body.orders[2].articles[0].quantite).toBe(2);
+        expect(orderResponse.body.orders[2].articles[0].totalArticle).toBe(10.8);
         // article 2 : menu 
-        expect(ordersResponse.body.orders[2].articles[1].type).toBe('Menu');
-        expect(ordersResponse.body.orders[2].articles[1].id_element).toBe('7a6b442e279ded257bfe5c40');
-        expect(ordersResponse.body.orders[2].articles[1].quantite).toBe(2);
-        expect(ordersResponse.body.orders[2].articles[1].totalArticle).toBe(22);
+        expect(orderResponse.body.orders[2].articles[1].type).toBe('Menu');
+        expect(orderResponse.body.orders[2].articles[1].id_element).toBe('7a6b442e279ded257bfe5c40');
+        expect(orderResponse.body.orders[2].articles[1].quantite).toBe(2);
+        expect(orderResponse.body.orders[2].articles[1].totalArticle).toBe(22);
         // Status de la commande
-        expect(ordersResponse.body.orders[2].status).toBe('brouillon');
+        expect(orderResponse.body.orders[2].status).toBe('brouillon');
 
     });
   });

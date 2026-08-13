@@ -37,9 +37,11 @@ afterAll(async() => {
 
 
 describe('DELETE /menus/:id', () => {
-  // ADMIN
-  it('Un administrateur peut supprimer un menu', async() => {
-    mockCurrentRole = 'administrateur';
+
+let menuId;
+
+beforeEach(async () => {
+   mockCurrentRole = 'administrateur';
     // création du produit
     const menuResponse = await request(app)
       .post('/api/menus')
@@ -59,11 +61,16 @@ describe('DELETE /menus/:id', () => {
       // on s'attend à ce que le statuts de la réponse soit : 
       expect(menuResponse.statusCode).toBe(201);
 
-      const menuId = menuResponse.body._id;
+      menuId = menuResponse.body._id;
+});
 
-      // Supression du produit
+  // ADMIN
+  it('Un administrateur peut supprimer un menu', async() => {
+  mockCurrentRole = 'administrateur';
+
+      // Supression du menu
       const response = await request(app)
-        .delete('/api/menus/' + menuId)
+        .delete(`/api/menus/${menuId}`)
         .set('Authorization', 'Bearer token');
 
         console.log(response.body);
@@ -77,8 +84,10 @@ describe('DELETE /menus/:id', () => {
     mockCurrentRole = 'accueil';
 
   const response = await request(app) 
-  .delete('/api/menus/:id') 
-  .set('Authorization', 'Bearer token'); 
+  .delete(`/api/menus/${menuId}`)
+  .set('Authorization', 'Bearer token');
+  
+  console.log(response.body);
 
   expect(response.statusCode).toBe(403);
   
@@ -88,8 +97,10 @@ describe('DELETE /menus/:id', () => {
     mockCurrentRole = 'preparateur';
 
   const response = await request(app) 
-  .delete('/api/menus/:id')  
+  .delete(`/api/menus/${menuId}`) 
   .set('Authorization', 'Bearer token'); 
+
+  console.log(response.body);
 
   expect(response.statusCode).toBe(403);
   
@@ -100,7 +111,7 @@ describe('DELETE /menus/:id', () => {
     mockCurrentRole = 'client';
 
   const response = await request(app) 
-  .delete('/api/menus/:id') 
+  .delete(`/api/menus/${menuId}`)
   .set('Authorization', 'Bearer token'); 
 
   console.log(response.body);

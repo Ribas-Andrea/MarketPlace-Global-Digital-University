@@ -4,109 +4,118 @@ const request = require("supertest");
 const {MongoMemoryServer} = require("mongodb-memory-server");
 const mongoose = require("mongoose");
 
-
 let mockCurrentRole = 'administrateur';
+let productId;
 
-
-// on fait unn moke pour simuler la connexion : 
+// on fait un mock pour simuler la connexion :
 jest.mock('../../middleware/auth', () => {
   return (req, res, next) => {
     req.user = {
-      userId: '6a58e381df483c9e75bdbb2d', // on met n'importe quel id
+      userId: '6a58e381df483c9e75bdbb2d',
       role: mockCurrentRole
     };
     next();
   };
-})
+});
 
 const app = require("../../index");
 
-
 let mongoServer;
 
-beforeAll(async() => {
+beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
-  await mongoose.connect(mongoServer.getUri(), {dbName: 'test'});
-})
 
-afterAll(async() => {
+  await mongoose.connect(mongoServer.getUri(), {
+    dbName: 'test'
+  });
+
+  
+  mockCurrentRole = 'administrateur';
+  
+  // Création du produit pour les tests
+  const productResponse = await request(app)
+    .post('/api/products')
+    .field('nom', 'Mon produit')
+    .field('prix', '8.8')
+    .field('categorie', 'burgers')
+    .field('disponible', 'true')
+    .attach('image', 'tests/imagesTest/BIGMAC.png')
+    .set('Authorization', 'Bearer token');
+
+  expect(productResponse.statusCode).toBe(201);
+
+  productId = productResponse.body._id;
+
+  console.log('Product ID utilisé pour les tests :', productId);
+});
+
+afterAll(async () => {
   await mongoose.disconnect();
   await mongoServer.stop();
 });
 
-describe('GET /products/:id', () => {
-  //ADMIN
-  it('Affiche un produit', async() => {
+describe('PUT /products/:id', () => {
+
+  // ADMIN
+  it('Un administrateur peut modifier un produit', async () => {
     mockCurrentRole = 'administrateur';
-    // création du produit
-    const productResponse = await request(app)
-      .post('/api/products')
-      .field('nom', 'Mon produit')
-      .field('prix', '8.8')
-      .field('categorie', 'burgers')
-      .field('disponible', 'true')
-      .attach('image', 'tests/imagesTest/BIGMAC.png')
+
+    const response = await request(app)
+      .put(`/api/products/${productId}`)
+      .field('disponible', 'false')
       .set('Authorization', 'Bearer token');
 
-      console.log(productResponse.body);
+    console.log(response.body);
 
-      // on s'attend à ce que le statuts de la réponse soit : 
-      expect(productResponse.statusCode).toBe(201);
+    expect(response.statusCode).toBe(200);
 
-      const productId = productResponse.body._id;
-
-      // Modification du produit
-      const response = await request(app)
-        .put('/api/products/' + productId)
-        .field('disponible', 'false')
-        .set('Authorization', 'Bearer token');
-
-        console.log(response.body);
-
-        // on vérifie la réponse : 
-        expect(response.statusCode).toBe(200);
-        expect(response.body.nom).toBe('Mon produit');
-        expect(response.body.prix).toBe(8.8);
-        expect(response.body.categorie).toBe('burgers');
-        expect(response.body.disponible).toBe(false);
-        expect(response.body.image).toBeDefined();
+    expect(response.body.nom).toBe('Mon produit');
+    expect(response.body.prix).toBe(8.8);
+    expect(response.body.categorie).toBe('burgers');
+    expect(response.body.disponible).toBe(false);
+    expect(response.body.image).toBeDefined();
   });
 
-      // ACCUEIL
-  it('Un membre de l’accueil ne peut pas modifier un produit', async() => {
+  // ACCUEIL
+  it('Un membre de l’accueil ne peut pas modifier un produit', async () => {
     mockCurrentRole = 'accueil';
 
-  const response = await request(app) 
-  .put('/api/products/:id') 
-  .set('Authorization', 'Bearer token'); 
+    const response = await request(app)
+      .put(`/api/products/${productId}`)
+      .field('disponible', 'true')
+      .set('Authorization', 'Bearer token');
 
-  expect(response.statusCode).toBe(403);
-  
+    console.log(response.body);
+
+    expect(response.statusCode).toBe(403);
   });
+
   // PREPARATEUR
-  it('Un préparateur ne peut pas modifier un produit', async() => {
+  it('Un préparateur ne peut pas modifier un produit', async () => {
     mockCurrentRole = 'preparateur';
 
-  const response = await request(app) 
-  .put('/api/products/:id')  
-  .set('Authorization', 'Bearer token'); 
+    const response = await request(app)
+      .put(`/api/products/${productId}`)
+      .field('disponible', 'true')
+      .set('Authorization', 'Bearer token');
 
-  expect(response.statusCode).toBe(403);
-  
+    console.log(response.body);
+
+    expect(response.statusCode).toBe(403);
   });
 
   // CLIENT
-  it('Un client ne peut pas modifier un produit', async() => {
+  it('Un client ne peut pas modifier un produit', async () => {
     mockCurrentRole = 'client';
 
-  const response = await request(app) 
-  .put('/api/products/:id') 
-  .set('Authorization', 'Bearer token'); 
+    const response = await request(app)
+      .put(`/api/products/${productId}`)
+      .field('disponible', 'true')
+      .set('Authorization', 'Bearer token');
 
-  console.log(response.body);
+    console.log(response.body);
 
-  expect(response.statusCode).toBe(403);
-  
+    expect(response.statusCode).toBe(403);
   });
-});
 
+});

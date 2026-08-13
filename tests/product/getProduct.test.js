@@ -29,13 +29,16 @@ beforeAll(async() => {
   await mongoose.connect(mongoServer.getUri(), {dbName: 'test'});
 })
 
+
+
 afterAll(async() => {
   await mongoose.disconnect();
   await mongoServer.stop();
 });
 
 describe('GET /products/:id', () => {
- let productId;
+
+  let productId;
 
   beforeAll(async () => {
     mockCurrentRole = 'administrateur';
@@ -62,19 +65,19 @@ describe('GET /products/:id', () => {
       mockCurrentRole = role;
 
       // Récupération du produit
-      const response = await request(app)
+      const productResponse = await request(app)
       .get('/api/products/' + productId)
       .set('Authorization', 'Bearer token');
 
-      console.log(response.body);
+      console.log(productResponse.body);
 
       // on vérifie la réponse : 
-      expect(response.statusCode).toBe(200);
-      expect(response.body.product.nom).toBe('Mon produit');
-      expect(response.body.product.prix).toBe(8.8);
-      expect(response.body.product.categorie).toBe('burgers');
-      expect(response.body.product.disponible).toBe(true);
-      expect(response.body.product.image).toBeDefined();
+      expect(productResponse.statusCode).toBe(200);
+      expect(productResponse.body.product.nom).toBe('Mon produit');
+      expect(productResponse.body.product.prix).toBe(8.8);
+      expect(productResponse.body.product.categorie).toBe('burgers');
+      expect(productResponse.body.product.disponible).toBe(true);
+      expect(productResponse.body.product.image).toBeDefined();
     });
   });
 });

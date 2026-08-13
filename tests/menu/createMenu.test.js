@@ -77,6 +77,8 @@ describe('POST /menus', () => {
   .post('/api/menus') 
   .set('Authorization', 'Bearer token'); 
 
+  console.log(menuResponse.body);
+
   expect(menuResponse.statusCode).toBe(403);
   
   });
@@ -87,6 +89,8 @@ describe('POST /menus', () => {
   const menuResponse = await request(app) 
   .post('/api/menus') 
   .set('Authorization', 'Bearer token'); 
+
+  console.log(menuResponse.body);
 
   expect(menuResponse.statusCode).toBe(403);
   

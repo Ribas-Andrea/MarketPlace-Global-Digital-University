@@ -93,51 +93,51 @@ describe('GET /menus', () => {
    it(`Un ${role} peut afficher la liste des menus`, async () => {
       mockCurrentRole = role;
       // Récupération du menu
-      const response = await request(app)
+      const menuResponse = await request(app)
         .get('/api/menus/')
         .set('Authorization', 'Bearer token');
 
-      console.log(response.body);
+      console.log(menuResponse.body);
 
       // On vérifie la réponse
-      expect(response.statusCode).toBe(200);
-      expect(response.body.menus).toHaveLength(3);
+      expect(menuResponse.statusCode).toBe(200);
+      expect(menuResponse.body.menus).toHaveLength(3);
 
       // on vérifie les réponses : 
 
       // Mon Menu 1
-      expect(response.body.menus[0].nom).toBe('Mon menu 1');
-      expect(response.body.menus[0].prix).toBe(10.8);
-      expect(response.body.menus[0].categorie).toBe('burgers');
-      expect(response.body.menus[0].disponible).toBe(true);
-      expect(response.body.menus[0].options.taille).toBe('Menu Best Of');
-      expect(response.body.menus[0].options.accompagnement).toBe('Frites');
-      expect(response.body.menus[0].options.boisson).toBe('Coca');
-      expect(response.body.menus[0].options.sauce).toBe('Barbecue');
-      expect(response.body.menus[0].imageBurger).toBeDefined();
+      expect(menuResponse.body.menus[0].nom).toBe('Mon menu 1');
+      expect(menuResponse.body.menus[0].prix).toBe(10.8);
+      expect(menuResponse.body.menus[0].categorie).toBe('burgers');
+      expect(menuResponse.body.menus[0].disponible).toBe(true);
+      expect(menuResponse.body.menus[0].options.taille).toBe('Menu Best Of');
+      expect(menuResponse.body.menus[0].options.accompagnement).toBe('Frites');
+      expect(menuResponse.body.menus[0].options.boisson).toBe('Coca');
+      expect(menuResponse.body.menus[0].options.sauce).toBe('Barbecue');
+      expect(menuResponse.body.menus[0].imageBurger).toBeDefined();
 
 
       // Mon menu 2
-      expect(response.body.menus[1].nom).toBe('Mon menu 2');
-      expect(response.body.menus[1].prix).toBe(6.8);
-      expect(response.body.menus[1].categorie).toBe('burgers');
-      expect(response.body.menus[1].disponible).toBe(true);
-      expect(response.body.menus[1].options.taille).toBe('Menu Maxi Best Of');
-      expect(response.body.menus[1].options.accompagnement).toBe('Frites');
-      expect(response.body.menus[1].options.boisson).toBe('Coca');
-      expect(response.body.menus[1].options.sauce).toBe('Barbecue');
-      expect(response.body.menus[1].imageBurger).toBeDefined();
+      expect(menuResponse.body.menus[1].nom).toBe('Mon menu 2');
+      expect(menuResponse.body.menus[1].prix).toBe(6.8);
+      expect(menuResponse.body.menus[1].categorie).toBe('burgers');
+      expect(menuResponse.body.menus[1].disponible).toBe(true);
+      expect(menuResponse.body.menus[1].options.taille).toBe('Menu Maxi Best Of');
+      expect(menuResponse.body.menus[1].options.accompagnement).toBe('Frites');
+      expect(menuResponse.body.menus[1].options.boisson).toBe('Coca');
+      expect(menuResponse.body.menus[1].options.sauce).toBe('Barbecue');
+      expect(menuResponse.body.menus[1].imageBurger).toBeDefined();
 
       // Mon Menu 3
-      expect(response.body.menus[2].nom).toBe('Mon menu 3');
-      expect(response.body.menus[2].prix).toBe(11.8);
-      expect(response.body.menus[2].categorie).toBe('burgers');
-      expect(response.body.menus[2].disponible).toBe(false);
-      expect(response.body.menus[2].options.taille).toBe('Menu Maxi Best Of');
-      expect(response.body.menus[2].options.accompagnement).toBe('Potatoes');
-      expect(response.body.menus[2].options.boisson).toBe('Eau');
-      expect(response.body.menus[2].options.sauce).toBe('Chinoise');
-      expect(response.body.menus[2].imageBurger).toBeDefined();
+      expect(menuResponse.body.menus[2].nom).toBe('Mon menu 3');
+      expect(menuResponse.body.menus[2].prix).toBe(11.8);
+      expect(menuResponse.body.menus[2].categorie).toBe('burgers');
+      expect(menuResponse.body.menus[2].disponible).toBe(false);
+      expect(menuResponse.body.menus[2].options.taille).toBe('Menu Maxi Best Of');
+      expect(menuResponse.body.menus[2].options.accompagnement).toBe('Potatoes');
+      expect(menuResponse.body.menus[2].options.boisson).toBe('Eau');
+      expect(menuResponse.body.menus[2].options.sauce).toBe('Chinoise');
+      expect(menuResponse.body.menus[2].imageBurger).toBeDefined();
     });
   });
 }); 

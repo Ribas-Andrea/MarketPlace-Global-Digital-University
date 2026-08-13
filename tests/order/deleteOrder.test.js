@@ -85,7 +85,7 @@ afterAll(async() => {
 });
 
 
-describe('delete /orders/:id', () => {
+describe('DELETE /orders/:id', () => {
 
   const roles = ['administrateur', 'accueil', 'client'];
 
@@ -99,7 +99,6 @@ describe('delete /orders/:id', () => {
       .set('Authorization', 'Bearer token')
    
     console.log(orderResponse.body);
-console.log(orderResponse.statusCode);
 
       // on s'attend à ce que le statuts de la réponse soit : 
       expect(orderResponse.statusCode).toBe(200);
@@ -116,6 +115,8 @@ console.log(orderResponse.statusCode);
   const orderResponse = await request(app) 
   .delete(`/api/orders/${listOrderId[0]}`)
   .set('Authorization', 'Bearer token'); 
+
+  console.log(orderResponse.body);
 
   expect(orderResponse.statusCode).toBe(403);
   

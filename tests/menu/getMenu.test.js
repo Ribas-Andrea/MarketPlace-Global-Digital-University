@@ -66,23 +66,23 @@ describe('GET /menus/:id', () => {
       mockCurrentRole = role;
 
       // Récupération du menu
-      const response = await request(app)
+      const menuResponse = await request(app)
       .get('/api/menus/' + menuId)
       .set('Authorization', 'Bearer token');
 
-      console.log(response.body);
+      console.log(menuResponse.body);
 
         // on vérifie le menu : 
-        expect(response.statusCode).toBe(200);
-        expect(response.body.menu.nom).toBe('Mon menu');
-        expect(response.body.menu.prix).toBe(10.8);
-        expect(response.body.menu.categorie).toBe('burgers');
-        expect(response.body.menu.disponible).toBe(true);
-        expect(response.body.menu.options.taille).toBe('Menu Best Of');
-        expect(response.body.menu.options.accompagnement).toBe('Frites');
-        expect(response.body.menu.options.boisson).toBe('Coca');
-        expect(response.body.menu.options.sauce).toBe('Barbecue');
-        expect(response.body.menu.imageBurger).toBeDefined();
+        expect(menuResponse.statusCode).toBe(200);
+        expect(menuResponse.body.menu.nom).toBe('Mon menu');
+        expect(menuResponse.body.menu.prix).toBe(10.8);
+        expect(menuResponse.body.menu.categorie).toBe('burgers');
+        expect(menuResponse.body.menu.disponible).toBe(true);
+        expect(menuResponse.body.menu.options.taille).toBe('Menu Best Of');
+        expect(menuResponse.body.menu.options.accompagnement).toBe('Frites');
+        expect(menuResponse.body.menu.options.boisson).toBe('Coca');
+        expect(menuResponse.body.menu.options.sauce).toBe('Barbecue');
+        expect(menuResponse.body.menu.imageBurger).toBeDefined();
     });
   });
 });
