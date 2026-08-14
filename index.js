@@ -1,4 +1,5 @@
 require('dotenv').config();
+
 const express = require('express');
 const connectDB = require('./config/db');
 const helmet = require('helmet');
@@ -8,9 +9,10 @@ const rateLimit = require('express-rate-limit');
 const app = express();
 
 app.set('trust proxy', 1);
-const setupSwagger = require('./swaggerConfig');
+
 app.use(helmet());
 app.use(cors());
+
 app.use(
   rateLimit({
     windowMs: 5 * 60 * 1000,
@@ -19,7 +21,6 @@ app.use(
 );
 
 app.use(express.json());
-
 app.use(express.static('uploads'));
 
 if (process.env.NODE_ENV !== 'test') {
@@ -33,9 +34,5 @@ app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/docs', require('./swaggerConfig'));
 
 setupSwagger(app);
-
-if (process.env.NODE_ENV !== 'test') {
-  app.listen(3000, () => console.log('Serveur running'));
-}
 
 module.exports = app;
