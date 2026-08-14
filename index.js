@@ -33,6 +33,13 @@ app.use('/api/menus', require('./routes/menuRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 
+app.get('/', (req, res) => {
+  res.status(200).json({
+    message: 'API Marketplace opérationnelle',
+    status: 'OK'
+  });
+});
+
 setupSwagger(app);
 
 // Serveur local uniquement
