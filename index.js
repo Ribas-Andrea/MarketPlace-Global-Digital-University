@@ -42,7 +42,6 @@ app.get('/', (req, res) => {
 
 setupSwagger(app);
 
-// Serveur local uniquement
 if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
   app.listen(3000, () => {
     console.log('Serveur running on http://localhost:3000');
