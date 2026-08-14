@@ -7,7 +7,9 @@ const Menu = require("../models/menu");
 
 exports.getOrders = async (req, res) =>{
   try {
-    const orders = await Order.find();
+    const orders = await Order
+    .find()
+    .sort({ createdAt: 1, _id: 1});
 
     res.status(200).json({ orders });
   } catch (err) {
@@ -39,9 +41,9 @@ exports.getOrder = async (req, res) => {
 exports.createOrder = async (req, res) => {
   try {
     let articles = [];
-for (let i=0; i<req.body.length ; i++) {
+for (let i=0; i<req.body.articles.length ; i++) {
 
-      const { type, id_element, quantite } = req.body[i];
+      const { type, id_element, quantite } = req.body.articles[i];
 
     let articlePanier;
 

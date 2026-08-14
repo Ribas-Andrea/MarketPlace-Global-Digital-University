@@ -2,9 +2,10 @@
   "name": "marketplace",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./index.js",
   "scripts": {
-    "test": "jest && mocha"
+    "test": "jest",
+    "test:mocha": "mocha"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +23,7 @@
     "helmet": "^8.3.0",
     "jest": "^30.4.2",
     "jsonwebtoken": "^9.0.3",
+    "mongodb-memory-server": "^11.2.0",
     "mongoose": "^9.8.0",
     "multer": "^2.2.0",
     "password-validator": "^5.3.0",
@@ -32,6 +34,7 @@
   },
   "devDependencies": {
     "chai": "^6.2.2",
-    "mocha": "^11.8.0"
+    "mocha": "^11.8.0",
+    "supertest": "^7.2.2"
   }
 }
