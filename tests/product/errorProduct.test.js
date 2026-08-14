@@ -34,17 +34,10 @@ afterAll(async () => {
 });
 
 describe('Tests des erreurs Product', () => {
-
-  // ============================================================
-  // GET /products/:id
-  // ============================================================
-
   it('GET /products/:id - ID invalide', async () => {
     mockCurrentRole = 'administrateur';
 
-    const response = await request(app)
-      .get('/api/products/123')
-      .set('Authorization', 'Bearer token');
+    const response = await request(app).get('/api/products/123').set('Authorization', 'Bearer token');
 
     console.log('GET produit - ID invalide :', response.body);
 
@@ -57,19 +50,13 @@ describe('Tests des erreurs Product', () => {
 
     const fakeId = new mongoose.Types.ObjectId().toString();
 
-    const response = await request(app)
-      .get(`/api/products/${fakeId}`)
-      .set('Authorization', 'Bearer token');
+    const response = await request(app).get(`/api/products/${fakeId}`).set('Authorization', 'Bearer token');
 
     console.log('GET produit - produit inexistant :', response.body);
 
     expect(response.statusCode).toBe(404);
     expect(response.body.error).toBe('Produit non trouvé');
   });
-
-  // ============================================================
-  // POST /products
-  // ============================================================
 
   it('POST /products - image absente', async () => {
     mockCurrentRole = 'administrateur';
@@ -156,17 +143,10 @@ describe('Tests des erreurs Product', () => {
     expect(response.body.error).toBe('Disponibilité obligatoire');
   });
 
-  // ============================================================
-  // PUT /products/:id
-  // ============================================================
-
   it('PUT /products/:id - ID invalide', async () => {
     mockCurrentRole = 'administrateur';
 
-    const response = await request(app)
-      .put('/api/products/123')
-      .field('disponible', 'false')
-      .set('Authorization', 'Bearer token');
+    const response = await request(app).put('/api/products/123').field('disponible', 'false').set('Authorization', 'Bearer token');
 
     console.log('Modification produit - ID invalide :', response.body);
 
@@ -179,10 +159,7 @@ describe('Tests des erreurs Product', () => {
 
     const fakeId = new mongoose.Types.ObjectId().toString();
 
-    const response = await request(app)
-      .put(`/api/products/${fakeId}`)
-      .field('disponible', 'false')
-      .set('Authorization', 'Bearer token');
+    const response = await request(app).put(`/api/products/${fakeId}`).field('disponible', 'false').set('Authorization', 'Bearer token');
 
     console.log('Modification produit - produit inexistant :', response.body);
 
@@ -190,16 +167,10 @@ describe('Tests des erreurs Product', () => {
     expect(response.body.error).toBe('Produit non trouvé');
   });
 
-  // ============================================================
-  // DELETE /products/:id
-  // ============================================================
-
   it('DELETE /products/:id - ID invalide', async () => {
     mockCurrentRole = 'administrateur';
 
-    const response = await request(app)
-      .delete('/api/products/123')
-      .set('Authorization', 'Bearer token');
+    const response = await request(app).delete('/api/products/123').set('Authorization', 'Bearer token');
 
     console.log('Suppression produit - ID invalide :', response.body);
 
@@ -212,9 +183,7 @@ describe('Tests des erreurs Product', () => {
 
     const fakeId = new mongoose.Types.ObjectId().toString();
 
-    const response = await request(app)
-      .delete(`/api/products/${fakeId}`)
-      .set('Authorization', 'Bearer token');
+    const response = await request(app).delete(`/api/products/${fakeId}`).set('Authorization', 'Bearer token');
 
     console.log('Suppression produit - produit inexistant :', response.body);
 

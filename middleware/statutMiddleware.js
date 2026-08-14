@@ -46,5 +46,4 @@ function canChangeOrderStatus(req, res, next) {
   next();
 }
 
-
-module.exports = {loadOrder , validateOrderStatus, canChangeOrderStatus};
+module.exports = { loadOrder, validateOrderStatus, canChangeOrderStatus };

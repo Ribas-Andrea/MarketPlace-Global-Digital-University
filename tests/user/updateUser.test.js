@@ -7,7 +7,6 @@ const bcrypt = require('bcryptjs');
 
 let mockCurrentRole = 'administrateur';
 
-// On fait un mock pour simuler la connexion :
 jest.mock('../../middleware/auth', () => {
   return (req, res, next) => {
     req.user = {
@@ -27,12 +26,10 @@ beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   await mongoose.connect(mongoServer.getUri(), { dbName: 'test' });
 
-  const userResponse = await request(app)
-    .post('/api/users')
-    .send({
-      username: 'test3@test.fr',
-      password: 'test123@456C'
-    });
+  const userResponse = await request(app).post('/api/users').send({
+    username: 'test3@test.fr',
+    password: 'test123@456C'
+  });
 
   userId = userResponse.body._id;
 });
@@ -47,27 +44,18 @@ describe('PUT /users/:id', () => {
   it('Un administrateur peut modifier le rôle et le mot de passe d’un utilisateur', async () => {
     mockCurrentRole = 'administrateur';
 
-    const userResponse = await request(app)
-      .put(`/api/users/${userId}`)
-      .set('Authorization', 'Bearer token')
-      .send({
-        password: 'test123@456D',
-        role: 'preparateur'
-      });
+    const userResponse = await request(app).put(`/api/users/${userId}`).set('Authorization', 'Bearer token').send({
+      password: 'test123@456D',
+      role: 'preparateur'
+    });
 
     console.log(userResponse.body);
 
-    // On s'attend à ce que le statut de la réponse soit :
     expect(userResponse.statusCode).toBe(200);
 
-    // Vérification du rôle
     expect(userResponse.body.role).toBe('preparateur');
 
-    // Vérification du mot de passe hashé
-    const passwordIsValid = await bcrypt.compare(
-      'test123@456D',
-      userResponse.body.password
-    );
+    const passwordIsValid = await bcrypt.compare('test123@456D', userResponse.body.password);
 
     expect(passwordIsValid).toBe(true);
   });
@@ -76,12 +64,9 @@ describe('PUT /users/:id', () => {
   it("Un administrateur ne peut pas modifier le mail d'un utilisateur", async () => {
     mockCurrentRole = 'administrateur';
 
-    const userResponse = await request(app)
-      .put(`/api/users/${userId}`)
-      .set('Authorization', 'Bearer token')
-      .send({
-        username: 'test1@test.fr'
-      });
+    const userResponse = await request(app).put(`/api/users/${userId}`).set('Authorization', 'Bearer token').send({
+      username: 'test1@test.fr'
+    });
 
     console.log(userResponse.body);
 
@@ -92,9 +77,7 @@ describe('PUT /users/:id', () => {
   it("Un membre de l'accueil ne peut pas modifier un utilisateur", async () => {
     mockCurrentRole = 'accueil';
 
-    const userResponse = await request(app)
-      .put(`/api/users/${userId}`)
-      .set('Authorization', 'Bearer token');
+    const userResponse = await request(app).put(`/api/users/${userId}`).set('Authorization', 'Bearer token');
 
     console.log(userResponse.body);
 
@@ -105,9 +88,7 @@ describe('PUT /users/:id', () => {
   it('Un préparateur ne peut pas modifier un utilisateur', async () => {
     mockCurrentRole = 'preparateur';
 
-    const userResponse = await request(app)
-      .put(`/api/users/${userId}`)
-      .set('Authorization', 'Bearer token');
+    const userResponse = await request(app).put(`/api/users/${userId}`).set('Authorization', 'Bearer token');
 
     console.log(userResponse.body);
 
@@ -118,9 +99,7 @@ describe('PUT /users/:id', () => {
   it('Un client ne peut pas modifier un utilisateur', async () => {
     mockCurrentRole = 'client';
 
-    const userResponse = await request(app)
-      .put(`/api/users/${userId}`)
-      .set('Authorization', 'Bearer token');
+    const userResponse = await request(app).put(`/api/users/${userId}`).set('Authorization', 'Bearer token');
 
     console.log(userResponse.body);
 

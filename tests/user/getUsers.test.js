@@ -6,7 +6,6 @@ const mongoose = require('mongoose');
 
 let mockCurrentRole = 'administrateur';
 
-// On fait un mock pour simuler la connexion :
 jest.mock('../../middleware/auth', () => {
   return (req, res, next) => {
     req.user = {
@@ -25,19 +24,15 @@ beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   await mongoose.connect(mongoServer.getUri(), { dbName: 'test' });
 
-  await request(app)
-    .post('/api/users')
-    .send({
-      username: 'test1@test.fr',
-      password: 'test123@456A'
-    });
+  await request(app).post('/api/users').send({
+    username: 'test1@test.fr',
+    password: 'test123@456A'
+  });
 
-  await request(app)
-    .post('/api/users')
-    .send({
-      username: 'test2@test.fr',
-      password: 'test123@456B'
-    });
+  await request(app).post('/api/users').send({
+    username: 'test2@test.fr',
+    password: 'test123@456B'
+  });
 });
 
 afterAll(async () => {
@@ -50,16 +45,12 @@ describe('GET /users', () => {
   it('Un administrateur peut afficher la liste des utilisateurs', async () => {
     mockCurrentRole = 'administrateur';
 
-    const userResponse = await request(app)
-      .get('/api/users')
-      .set('Authorization', 'Bearer token');
+    const userResponse = await request(app).get('/api/users').set('Authorization', 'Bearer token');
 
     console.log(userResponse.body);
 
-    // On s'attend à ce que le statut de la réponse soit :
     expect(userResponse.statusCode).toBe(200);
 
-    // On vérifie la liste des utilisateurs :
     expect(userResponse.body.users).toBeDefined();
     expect(userResponse.body.users.length).toBeGreaterThan(0);
 
@@ -74,9 +65,7 @@ describe('GET /users', () => {
   it("Un membre de l'accueil ne peut pas afficher la liste des utilisateurs", async () => {
     mockCurrentRole = 'accueil';
 
-    const userResponse = await request(app)
-      .get('/api/users')
-      .set('Authorization', 'Bearer token');
+    const userResponse = await request(app).get('/api/users').set('Authorization', 'Bearer token');
 
     console.log(userResponse.body);
 
@@ -87,9 +76,7 @@ describe('GET /users', () => {
   it('Un préparateur ne peut pas afficher la liste des utilisateurs', async () => {
     mockCurrentRole = 'preparateur';
 
-    const userResponse = await request(app)
-      .get('/api/users')
-      .set('Authorization', 'Bearer token');
+    const userResponse = await request(app).get('/api/users').set('Authorization', 'Bearer token');
 
     console.log(userResponse.body);
 
@@ -100,9 +87,7 @@ describe('GET /users', () => {
   it('Un client ne peut pas afficher la liste des utilisateurs', async () => {
     mockCurrentRole = 'client';
 
-    const userResponse = await request(app)
-      .get('/api/users')
-      .set('Authorization', 'Bearer token');
+    const userResponse = await request(app).get('/api/users').set('Authorization', 'Bearer token');
 
     console.log(userResponse.body);
 

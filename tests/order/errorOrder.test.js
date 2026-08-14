@@ -90,12 +90,8 @@ afterAll(async () => {
 });
 
 describe('Tests des erreurs Order', () => {
-
-  // Vérifie qu'un ID invalide renvoie une erreur 400 lors de la récupération d'une commande.
   it('GET /orders/:id - ID invalide', async () => {
-    const response = await request(app)
-      .get('/api/orders/123')
-      .set('Authorization', 'Bearer token');
+    const response = await request(app).get('/api/orders/123').set('Authorization', 'Bearer token');
 
     console.log('GET commande - ID invalide :', response.body);
 
@@ -103,13 +99,10 @@ describe('Tests des erreurs Order', () => {
     expect(response.body.error).toBe('ID invalide');
   });
 
-  // Vérifie qu'un ID valide mais inexistant renvoie une erreur 404.
   it('GET /orders/:id - commande inexistante', async () => {
     const fakeId = new mongoose.Types.ObjectId().toString();
 
-    const response = await request(app)
-      .get(`/api/orders/${fakeId}`)
-      .set('Authorization', 'Bearer token');
+    const response = await request(app).get(`/api/orders/${fakeId}`).set('Authorization', 'Bearer token');
 
     console.log('GET commande - commande inexistante :', response.body);
 
@@ -117,7 +110,6 @@ describe('Tests des erreurs Order', () => {
     expect(response.body.error).toBe('Commande non trouvée');
   });
 
-  // Vérifie qu'un type d'article autre que Product ou Menu renvoie une erreur 400.
   it('POST /orders - type article invalide', async () => {
     mockCurrentRole = 'client';
 
@@ -140,7 +132,6 @@ describe('Tests des erreurs Order', () => {
     expect(response.body.error).toBe("Type d'article invalide");
   });
 
-  // Vérifie qu'un article qui n'existe pas renvoie une erreur 404.
   it('POST /orders - article inexistant', async () => {
     mockCurrentRole = 'client';
 
@@ -165,18 +156,14 @@ describe('Tests des erreurs Order', () => {
     expect(response.body.error).toBe('Article non trouvé');
   });
 
-  // Vérifie qu'un ID invalide renvoie une erreur 400 lors de la modification d'une commande.
   it('PUT /orders/:id - ID invalide', async () => {
     mockCurrentRole = 'administrateur';
 
-    const response = await request(app)
-      .put('/api/orders/123')
-      .set('Authorization', 'Bearer token')
-      .send({
-        type: 'Product',
-        id_element: productId,
-        quantite: 3
-      });
+    const response = await request(app).put('/api/orders/123').set('Authorization', 'Bearer token').send({
+      type: 'Product',
+      id_element: productId,
+      quantite: 3
+    });
 
     console.log('Modification commande - ID invalide :', response.body);
 
@@ -184,20 +171,16 @@ describe('Tests des erreurs Order', () => {
     expect(response.body.error).toBe('ID invalide');
   });
 
-  // Vérifie qu'une commande inexistante renvoie une erreur 404 lors de la modification.
   it('PUT /orders/:id - commande inexistante', async () => {
     mockCurrentRole = 'administrateur';
 
     const fakeId = new mongoose.Types.ObjectId().toString();
 
-    const response = await request(app)
-      .put(`/api/orders/${fakeId}`)
-      .set('Authorization', 'Bearer token')
-      .send({
-        type: 'Product',
-        id_element: productId,
-        quantite: 3
-      });
+    const response = await request(app).put(`/api/orders/${fakeId}`).set('Authorization', 'Bearer token').send({
+      type: 'Product',
+      id_element: productId,
+      quantite: 3
+    });
 
     console.log('Modification commande - commande inexistante :', response.body);
 
@@ -205,18 +188,14 @@ describe('Tests des erreurs Order', () => {
     expect(response.body.error).toBe('Commande non trouvé');
   });
 
-  // Vérifie qu'un article qui n'est pas présent dans la commande renvoie une erreur 404.
   it('PUT /orders/:id - article absent de la commande', async () => {
     mockCurrentRole = 'administrateur';
 
-    const response = await request(app)
-      .put(`/api/orders/${orderId}`)
-      .set('Authorization', 'Bearer token')
-      .send({
-        type: 'Product',
-        id_element: new mongoose.Types.ObjectId().toString(),
-        quantite: 3
-      });
+    const response = await request(app).put(`/api/orders/${orderId}`).set('Authorization', 'Bearer token').send({
+      type: 'Product',
+      id_element: new mongoose.Types.ObjectId().toString(),
+      quantite: 3
+    });
 
     console.log('Modification commande - article absent :', response.body);
 
@@ -224,13 +203,10 @@ describe('Tests des erreurs Order', () => {
     expect(response.body.error).toBe('Article non trouvé dans la commande');
   });
 
-  // Vérifie qu'un ID invalide renvoie une erreur 400 lors de la suppression d'une commande.
   it('DELETE /orders/:id - ID invalide', async () => {
     mockCurrentRole = 'administrateur';
 
-    const response = await request(app)
-      .delete('/api/orders/123')
-      .set('Authorization', 'Bearer token');
+    const response = await request(app).delete('/api/orders/123').set('Authorization', 'Bearer token');
 
     console.log('Suppression commande - ID invalide :', response.body);
 
@@ -238,15 +214,12 @@ describe('Tests des erreurs Order', () => {
     expect(response.body.error).toBe('ID invalide');
   });
 
-  // Vérifie qu'une commande inexistante renvoie une erreur 404 lors de sa suppression.
   it('DELETE /orders/:id - commande inexistante', async () => {
     mockCurrentRole = 'administrateur';
 
     const fakeId = new mongoose.Types.ObjectId().toString();
 
-    const response = await request(app)
-      .delete(`/api/orders/${fakeId}`)
-      .set('Authorization', 'Bearer token');
+    const response = await request(app).delete(`/api/orders/${fakeId}`).set('Authorization', 'Bearer token');
 
     console.log('Suppression commande - commande inexistante :', response.body);
 

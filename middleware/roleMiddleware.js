@@ -8,8 +8,8 @@ const roleCheck = (...authRoles) => {
       return res.status(403).json({ message: 'Accès non autorisé pour votre rôle' });
     }
 
-    next()
-  }
-}
+    next();
+  };
+};
 
 module.exports = roleCheck;

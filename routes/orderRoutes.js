@@ -1,12 +1,11 @@
-const express = require("express");
-const upload = require("../middleware/multer")
-const { getOrders, getOrder, createOrder, updateOrder, deleteOrder, updateOrderStatus } = require("../controllers/orderController");
+const express = require('express');
+const upload = require('../middleware/multer');
+const { getOrders, getOrder, createOrder, updateOrder, deleteOrder, updateOrderStatus } = require('../controllers/orderController');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const roleCheck = require('../middleware/roleMiddleware');
 const ROLES = require('../config/roles');
 const { loadOrder, validateOrderStatus, canChangeOrderStatus } = require('../middleware/statutMiddleware');
-
 
 /**
  * @swagger
@@ -14,7 +13,6 @@ const { loadOrder, validateOrderStatus, canChangeOrderStatus } = require('../mid
  *  name: Commandes
  *  description: Gestion des commandes
  */
-
 
 /**
  * @swagger
@@ -73,7 +71,7 @@ const { loadOrder, validateOrderStatus, canChangeOrderStatus } = require('../mid
  *          500:
  *              description: Erreur lors de la récupération des commandes
  */
-router.get('/', auth, getOrders); // Liste des commandes
+router.get('/', auth, getOrders);
 
 /**
  * @swagger
@@ -102,7 +100,7 @@ router.get('/', auth, getOrders); // Liste des commandes
  *          500:
  *              description: Erreur lors de la récupération de la commande
  */
-router.get('/:id', auth, getOrder); // Détail d'une commande
+router.get('/:id', auth, getOrder);
 
 /**
  * @swagger
@@ -148,7 +146,7 @@ router.get('/:id', auth, getOrder); // Détail d'une commande
  *          500:
  *              description: Erreur lors de la création de la commande
  */
-router.post('/', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), upload.none(),createOrder); // Création d'une commande
+router.post('/', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), upload.none(), createOrder);
 
 /**
  * @swagger
@@ -195,7 +193,7 @@ router.post('/', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), uplo
  *          500:
  *              description: Erreur lors de la modification de la commande
  */
-router.put('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), upload.none(), updateOrder); // Modification d'une commande
+router.put('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), upload.none(), updateOrder);
 
 /**
  * @swagger
@@ -226,7 +224,7 @@ router.put('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), up
  *          500:
  *              description: Erreur lors de la suppression de la commande
  */
-router.delete('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), deleteOrder); // Suppression d'une commande
+router.delete('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), deleteOrder);
 
 /**
  * @swagger
@@ -297,7 +295,6 @@ router.delete('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT),
  *          500:
  *              description: Erreur lors de la mise à jour du statut de la commande
  */
-router.patch('/status/:id', auth, upload.none(), loadOrder, validateOrderStatus, canChangeOrderStatus, updateOrderStatus)// Modification du statut d'une commande
+router.patch('/status/:id', auth, upload.none(), loadOrder, validateOrderStatus, canChangeOrderStatus, updateOrderStatus);
 
-
-module.exports = router; 
+module.exports = router;

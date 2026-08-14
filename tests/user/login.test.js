@@ -13,12 +13,10 @@ beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   await mongoose.connect(mongoServer.getUri(), { dbName: 'test' });
 
-  await request(app)
-    .post('/api/users')
-    .send({
-      username: 'test1@test.fr',
-      password: 'test123@456A'
-    });
+  await request(app).post('/api/users').send({
+    username: 'test1@test.fr',
+    password: 'test123@456A'
+  });
 });
 
 afterAll(async () => {
@@ -28,28 +26,20 @@ afterAll(async () => {
 
 describe('POST /users/login', () => {
   it(`Un utilisateur peut se connecter à son compte`, async () => {
-    const userResponse = await request(app)
-      .post('/api/users/login')
-      .send({
-        username: 'test1@test.fr',
-        password: 'test123@456A'
-      });
+    const userResponse = await request(app).post('/api/users/login').send({
+      username: 'test1@test.fr',
+      password: 'test123@456A'
+    });
 
     console.log(userResponse.body);
 
-    // On s'attend à ce que le statut de la réponse soit :
     expect(userResponse.statusCode).toBe(200);
 
-    // On vérifie l'utilisateur :
     expect(userResponse.body.user.username).toBe('test1@test.fr');
     expect(userResponse.body.user.role).toBe('client');
     expect(userResponse.body.token).toBeDefined();
 
-    // Vérification du mot de passe hashé
-    const passwordIsValid = await bcrypt.compare(
-      'test123@456A',
-      userResponse.body.user.password
-    );
+    const passwordIsValid = await bcrypt.compare('test123@456A', userResponse.body.user.password);
 
     expect(passwordIsValid).toBe(true);
   });

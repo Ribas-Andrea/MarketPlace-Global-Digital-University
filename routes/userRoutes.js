@@ -1,12 +1,10 @@
-const express = require("express");
-const { register, login, deleteUser, updateUser, getUsers, getUser } = require("../controllers/authController");
+const express = require('express');
+const { register, login, deleteUser, updateUser, getUsers, getUser } = require('../controllers/authController');
 const router = express.Router();
-const {body} = require('express-validator');
+const { body } = require('express-validator');
 const auth = require('../middleware/auth');
 const roleCheck = require('../middleware/roleMiddleware');
 const ROLES = require('../config/roles');
-
-
 
 /**
  * @swagger
@@ -14,7 +12,6 @@ const ROLES = require('../config/roles');
  *    name: Users
  *    description: Gestion des utilisateurs
  */
-
 
 /**
  * @swagger
@@ -62,7 +59,7 @@ const ROLES = require('../config/roles');
  *       500:
  *         description: Erreur serveur
  */
-router.post('/', register); // Inscription
+router.post('/', register);
 
 /**
  * @swagger
@@ -102,7 +99,7 @@ router.post('/', register); // Inscription
  *       500:
  *         description: Erreur lors de la récupération des utilisateurs
  */
-router.get('/', auth, roleCheck(ROLES.ADMIN), getUsers); // Récupérer la liste des utilisateurs
+router.get('/', auth, roleCheck(ROLES.ADMIN), getUsers);
 
 /**
  * @swagger
@@ -151,7 +148,7 @@ router.get('/', auth, roleCheck(ROLES.ADMIN), getUsers); // Récupérer la liste
  *       500:
  *         description: Erreur lors de la récupération de l'utilisateur
  */
-router.get('/:id', auth, roleCheck(ROLES.ADMIN), getUser); // Récupérer un utilisateur
+router.get('/:id', auth, roleCheck(ROLES.ADMIN), getUser);
 
 /**
  * @swagger
@@ -189,10 +186,10 @@ router.get('/:id', auth, roleCheck(ROLES.ADMIN), getUser); // Récupérer un uti
  *         description: Email, password et role obligatoire ou Identifiant Invalides
  *       403:
  *         description: Accès non autorisé pour votre rôle
- *       500: 
+ *       500:
  *         description: Erreur Serveur
  */
-router.post('/login', body('username').isEmail(), login); // Connexion
+router.post('/login', body('username').isEmail(), login);
 
 /**
  * @swagger
@@ -256,7 +253,7 @@ router.post('/login', body('username').isEmail(), login); // Connexion
  *       500:
  *         description: Erreur lors de la modification de l'utilisateur
  */
-router.put('/:id', auth, roleCheck(ROLES.ADMIN), updateUser); // Modifier un utilisateur
+router.put('/:id', auth, roleCheck(ROLES.ADMIN), updateUser);
 
 /**
  * @swagger
@@ -285,6 +282,6 @@ router.put('/:id', auth, roleCheck(ROLES.ADMIN), updateUser); // Modifier un uti
  *       500:
  *         description: Erreur lors de la suppression de l'utilisateur
  */
-router.delete('/:id', auth, roleCheck(ROLES.ADMIN), deleteUser); // Supprimer un utilisateur
+router.delete('/:id', auth, roleCheck(ROLES.ADMIN), deleteUser);
 
-module.exports = router; 
+module.exports = router;

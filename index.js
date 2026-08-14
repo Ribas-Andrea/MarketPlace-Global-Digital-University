@@ -5,21 +5,21 @@ const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 
-
 const app = express();
 const setupSwagger = require('./swaggerConfig');
 app.use(helmet());
 app.use(cors());
-app.use(rateLimit({
-  windowMs: 5 * 60 * 1000,
-  max : 100
-}));
+app.use(
+  rateLimit({
+    windowMs: 5 * 60 * 1000,
+    max: 100
+  })
+);
 
 app.use(express.json());
 
 app.use(express.static('uploads'));
 
-// Connexion à MongoDB uniquement hors environnement de test
 if (process.env.NODE_ENV !== 'test') {
   connectDB();
 }
@@ -30,40 +30,10 @@ app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/docs', require('./swaggerConfig'));
 
-
 setupSwagger(app);
 
-// Démarrage du serveur uniquement hors environnement de test
 if (process.env.NODE_ENV !== 'test') {
   app.listen(3000, () => console.log('Serveur running'));
 }
 
 module.exports = app;
-
-
-// Routes que l'on va avoir besoin : 
-
-// Liste des produits
-// Détail d'un produit
-// création d'un produit
-// ajouter un produit
-// modifier un produit
-// supprimer un produit
-
-
-// Liste des menus
-// Détail d'un menu
-// création d'un menu
-// ajouter un menu
-// modifier un menu
-// ajouter un menu
-
-// Liste des boissons
-// Détail d'une boisson
-// création d'une boisson
-// ajouter une boisson
-// modifier une boisson
-// supprimer une boisson
-
-// inscription
-// connexion

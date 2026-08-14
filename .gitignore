@@ -9,3 +9,5 @@ coverage/
 
 # Fichiers uploadés
 uploads/
+.vercel
+.env*

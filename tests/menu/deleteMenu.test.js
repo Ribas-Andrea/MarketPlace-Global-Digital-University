@@ -1,48 +1,41 @@
-process.env.NODE_ENV = "test";
+process.env.NODE_ENV = 'test';
 
-const request = require("supertest");
-const {MongoMemoryServer} = require("mongodb-memory-server");
-const mongoose = require("mongoose");
-
+const request = require('supertest');
+const { MongoMemoryServer } = require('mongodb-memory-server');
+const mongoose = require('mongoose');
 
 let mockCurrentRole = 'administrateur';
 
-
-// on fait unn moke pour simuler la connexion : 
 jest.mock('../../middleware/auth', () => {
   return (req, res, next) => {
     req.user = {
-      userId: '6a58e381df483c9e75bdbb2d', // on met n'importe quel id
+      userId: '6a58e381df483c9e75bdbb2d',
       role: mockCurrentRole
     };
     next();
   };
-})
+});
 
-
-const app = require("../../index");
-
+const app = require('../../index');
 
 let mongoServer;
 
-beforeAll(async() => {
+beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
-  await mongoose.connect(mongoServer.getUri(), {dbName: 'test'});
-})
+  await mongoose.connect(mongoServer.getUri(), { dbName: 'test' });
+});
 
-afterAll(async() => {
+afterAll(async () => {
   await mongoose.disconnect();
   await mongoServer.stop();
 });
 
-
 describe('DELETE /menus/:id', () => {
+  let menuId;
 
-let menuId;
+  beforeEach(async () => {
+    mockCurrentRole = 'administrateur';
 
-beforeEach(async () => {
-   mockCurrentRole = 'administrateur';
-    // création du produit
     const menuResponse = await request(app)
       .post('/api/menus')
       .field('nom', 'Mon menu')
@@ -56,69 +49,53 @@ beforeEach(async () => {
       .attach('imageBurger', 'tests/imagesTest/BIGMAC.png')
       .set('Authorization', 'Bearer token');
 
-      console.log(menuResponse.body);
+    console.log(menuResponse.body);
 
-      // on s'attend à ce que le statuts de la réponse soit : 
-      expect(menuResponse.statusCode).toBe(201);
+    expect(menuResponse.statusCode).toBe(201);
 
-      menuId = menuResponse.body._id;
-});
+    menuId = menuResponse.body._id;
+  });
 
   // ADMIN
-  it('Un administrateur peut supprimer un menu', async() => {
-  mockCurrentRole = 'administrateur';
+  it('Un administrateur peut supprimer un menu', async () => {
+    mockCurrentRole = 'administrateur';
 
-      // Supression du menu
-      const response = await request(app)
-        .delete(`/api/menus/${menuId}`)
-        .set('Authorization', 'Bearer token');
+    const response = await request(app).delete(`/api/menus/${menuId}`).set('Authorization', 'Bearer token');
 
-        console.log(response.body);
+    console.log(response.body);
 
-        // on vérifie la réponse : 
-        expect(response.statusCode).toBe(200);
+    expect(response.statusCode).toBe(200);
   });
 
-    // ACCUEIL
-  it('Un membre de l’accueil ne peut pas supprimer un menu', async() => {
+  // ACCUEIL
+  it('Un membre de l’accueil ne peut pas supprimer un menu', async () => {
     mockCurrentRole = 'accueil';
 
-  const response = await request(app) 
-  .delete(`/api/menus/${menuId}`)
-  .set('Authorization', 'Bearer token');
-  
-  console.log(response.body);
+    const response = await request(app).delete(`/api/menus/${menuId}`).set('Authorization', 'Bearer token');
 
-  expect(response.statusCode).toBe(403);
-  
+    console.log(response.body);
+
+    expect(response.statusCode).toBe(403);
   });
   // PREPARATEUR
-  it('Un préparateur ne peut pas supprimer un menu', async() => {
+  it('Un préparateur ne peut pas supprimer un menu', async () => {
     mockCurrentRole = 'preparateur';
 
-  const response = await request(app) 
-  .delete(`/api/menus/${menuId}`) 
-  .set('Authorization', 'Bearer token'); 
+    const response = await request(app).delete(`/api/menus/${menuId}`).set('Authorization', 'Bearer token');
 
-  console.log(response.body);
+    console.log(response.body);
 
-  expect(response.statusCode).toBe(403);
-  
+    expect(response.statusCode).toBe(403);
   });
 
   // CLIENT
-  it('Un client ne peut pas supprimer un menu', async() => {
+  it('Un client ne peut pas supprimer un menu', async () => {
     mockCurrentRole = 'client';
 
-  const response = await request(app) 
-  .delete(`/api/menus/${menuId}`)
-  .set('Authorization', 'Bearer token'); 
+    const response = await request(app).delete(`/api/menus/${menuId}`).set('Authorization', 'Bearer token');
 
-  console.log(response.body);
+    console.log(response.body);
 
-  expect(response.statusCode).toBe(403);
-  
+    expect(response.statusCode).toBe(403);
   });
-
 });
-

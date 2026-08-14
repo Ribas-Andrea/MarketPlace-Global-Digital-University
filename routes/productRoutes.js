@@ -1,12 +1,10 @@
-const express = require("express");
-const upload = require("../middleware/multer")
-const { getProducts, getProduct, createProduct, updateProduct, deleteProduct } = require("../controllers/productcontroller");
+const express = require('express');
+const upload = require('../middleware/multer');
+const { getProducts, getProduct, createProduct, updateProduct, deleteProduct } = require('../controllers/productcontroller');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const roleCheck = require('../middleware/roleMiddleware');
 const ROLES = require('../config/roles');
-
-
 
 /**
  * @swagger
@@ -14,7 +12,6 @@ const ROLES = require('../config/roles');
  *  name: Produits
  *  description: Gestion des produits
  */
-
 
 /**
  * @swagger
@@ -54,7 +51,7 @@ const ROLES = require('../config/roles');
  *          500:
  *              description: Erreur lors de la récupération des produits
  */
-router.get('/',  getProducts); // Liste des produits
+router.get('/', getProducts);
 
 /**
  * @swagger
@@ -105,7 +102,7 @@ router.get('/',  getProducts); // Liste des produits
  *          500:
  *              description: Erreur lors de la création du produit
  */
-router.get('/:id', getProduct); // Détail d'un produit
+router.get('/:id', getProduct);
 
 /**
  * @swagger
@@ -113,7 +110,7 @@ router.get('/:id', getProduct); // Détail d'un produit
  *    post:
  *      summary: Créer un nouveau produit
  *      tags: [Produits]
- *      security: 
+ *      security:
  *          - bearerAuth: []
  *      requestBody:
  *        required: true
@@ -157,7 +154,7 @@ router.get('/:id', getProduct); // Détail d'un produit
  *          500:
  *              description: Erreur lors de la création du produit
  */
-router.post('/', auth,  roleCheck(ROLES.ADMIN), upload.single('image'), createProduct); // Création d'un produit
+router.post('/', auth, roleCheck(ROLES.ADMIN), upload.single('image'), createProduct);
 
 /**
  * @swagger
@@ -165,7 +162,7 @@ router.post('/', auth,  roleCheck(ROLES.ADMIN), upload.single('image'), createPr
  *    put:
  *      summary: Modifier un produit
  *      tags: [Produits]
- *      security: 
+ *      security:
  *          - bearerAuth: []
  *      parameters:
  *       - in: path
@@ -230,7 +227,7 @@ router.post('/', auth,  roleCheck(ROLES.ADMIN), upload.single('image'), createPr
  *          500:
  *              description: Erreur lors de la modification du produit
  */
-router.put('/:id', auth,  roleCheck(ROLES.ADMIN), upload.single('image'), updateProduct); // Modification d'un produit
+router.put('/:id', auth, roleCheck(ROLES.ADMIN), upload.single('image'), updateProduct);
 
 /**
  * @swagger
@@ -259,6 +256,6 @@ router.put('/:id', auth,  roleCheck(ROLES.ADMIN), upload.single('image'), update
  *       500:
  *         description: Erreur lors de la suppression du produit
  */
-router.delete('/:id', auth,  roleCheck(ROLES.ADMIN), deleteProduct); // Suppression d'un produit
+router.delete('/:id', auth, roleCheck(ROLES.ADMIN), deleteProduct);
 
-module.exports = router; 
+module.exports = router;

@@ -10,7 +10,6 @@ let mockCurrentRole = 'administrateur';
 let userId;
 let otherUserId;
 
-// Mock du middleware auth pour simuler un utilisateur connecté
 jest.mock('../../middleware/auth', () => {
   return (req, res, next) => {
     req.user = {
@@ -32,7 +31,6 @@ beforeAll(async () => {
     dbName: 'test'
   });
 
-  // Création d'un utilisateur utilisé pour les tests
   const user = await User.create({
     _id: '6a7dc12c2f157c6b67176626',
     username: 'user@test.com',
@@ -40,7 +38,6 @@ beforeAll(async () => {
     role: 'client'
   });
 
-  // Création d'un deuxième utilisateur pour tester les droits
   const otherUser = await User.create({
     _id: '6a7dc12c2f157c6b67176627',
     username: 'other@test.com',
@@ -60,17 +57,11 @@ afterAll(async () => {
   await mongoServer.stop();
 });
 
-// ============================================================
-// GET /users/:id
-// ============================================================
-
 describe('GET /users/:id - cas d’erreur', () => {
-
   it('Retourne 400 avec un ID invalide', async () => {
     mockCurrentRole = 'administrateur';
 
-    const response = await request(app)
-      .get('/api/users/123');
+    const response = await request(app).get('/api/users/123');
 
     console.log('GET user ID invalide :', response.body);
 
@@ -81,8 +72,7 @@ describe('GET /users/:id - cas d’erreur', () => {
   it('Retourne 404 si l’utilisateur n’existe pas', async () => {
     mockCurrentRole = 'administrateur';
 
-    const response = await request(app)
-      .get('/api/users/6a7dc12c2f157c6b67176699');
+    const response = await request(app).get('/api/users/6a7dc12c2f157c6b67176699');
 
     console.log('GET user inexistant :', response.body);
 
@@ -91,32 +81,21 @@ describe('GET /users/:id - cas d’erreur', () => {
   });
 });
 
-// ============================================================
-// POST /users/
-// ============================================================
-
 describe('POST /users/ - cas d’erreur', () => {
-
   it('Retourne 400 si les données obligatoires sont absentes', async () => {
-    const response = await request(app)
-      .post('/api/users/')
-      .send({});
+    const response = await request(app).post('/api/users/').send({});
 
     console.log('Register données manquantes :', response.body);
 
     expect(response.statusCode).toBe(400);
-    expect(response.body.message).toBe(
-      'Email et password obligatoire'
-    );
+    expect(response.body.message).toBe('Email et password obligatoire');
   });
 
   it('Retourne 400 avec un mot de passe trop faible', async () => {
-    const response = await request(app)
-      .post('/api/users/')
-      .send({
-        username: 'weak@test.com',
-        password: 'password'
-      });
+    const response = await request(app).post('/api/users/').send({
+      username: 'weak@test.com',
+      password: 'password'
+    });
 
     console.log('Register mot de passe faible :', response.body);
 
@@ -125,12 +104,10 @@ describe('POST /users/ - cas d’erreur', () => {
   });
 
   it('Retourne 400 si le compte existe déjà', async () => {
-    const response = await request(app)
-      .post('/api/users/')
-      .send({
-        username: 'user@test.com',
-        password: 'Password123'
-      });
+    const response = await request(app).post('/api/users/').send({
+      username: 'user@test.com',
+      password: 'Password123'
+    });
 
     console.log('Register compte existant :', response.body);
 
@@ -139,12 +116,10 @@ describe('POST /users/ - cas d’erreur', () => {
   });
 
   it('Attribue automatiquement le rôle client lors de l’inscription', async () => {
-    const response = await request(app)
-      .post('/api/users/')
-      .send({
-        username: 'newuser@test.com',
-        password: 'Password123'
-      });
+    const response = await request(app).post('/api/users/').send({
+      username: 'newuser@test.com',
+      password: 'Password123'
+    });
 
     console.log('Register nouvel utilisateur :', response.body);
 
@@ -154,32 +129,21 @@ describe('POST /users/ - cas d’erreur', () => {
   });
 });
 
-// ============================================================
-// POST /users/login
-// ============================================================
-
 describe('POST /users/login - cas d’erreur', () => {
-
   it('Retourne 400 si les données de connexion sont absentes', async () => {
-    const response = await request(app)
-      .post('/api/users/login')
-      .send({});
+    const response = await request(app).post('/api/users/login').send({});
 
     console.log('Login données manquantes :', response.body);
 
     expect(response.statusCode).toBe(400);
-    expect(response.body.message).toBe(
-      'Email et password obligatoire'
-    );
+    expect(response.body.message).toBe('Email et password obligatoire');
   });
 
   it('Retourne 400 avec un utilisateur inexistant', async () => {
-    const response = await request(app)
-      .post('/api/users/login')
-      .send({
-        username: 'inexistant@test.com',
-        password: 'Password123'
-      });
+    const response = await request(app).post('/api/users/login').send({
+      username: 'inexistant@test.com',
+      password: 'Password123'
+    });
 
     console.log('Login utilisateur inexistant :', response.body);
 
@@ -188,12 +152,10 @@ describe('POST /users/login - cas d’erreur', () => {
   });
 
   it('Retourne 400 avec un mauvais mot de passe', async () => {
-    const response = await request(app)
-      .post('/api/users/login')
-      .send({
-        username: 'user@test.com',
-        password: 'WrongPassword123'
-      });
+    const response = await request(app).post('/api/users/login').send({
+      username: 'user@test.com',
+      password: 'WrongPassword123'
+    });
 
     console.log('Login mauvais mot de passe :', response.body);
 
@@ -202,20 +164,13 @@ describe('POST /users/login - cas d’erreur', () => {
   });
 });
 
-// ============================================================
-// PUT /users/:id
-// ============================================================
-
 describe('PUT /users/:id - cas d’erreur', () => {
-
   it('Retourne 400 avec un ID invalide', async () => {
     mockCurrentRole = 'administrateur';
 
-    const response = await request(app)
-      .put('/api/users/123')
-      .send({
-        password: 'Password123'
-      });
+    const response = await request(app).put('/api/users/123').send({
+      password: 'Password123'
+    });
 
     console.log('PUT user ID invalide :', response.body);
 
@@ -226,11 +181,9 @@ describe('PUT /users/:id - cas d’erreur', () => {
   it('Retourne 404 si l’utilisateur n’existe pas', async () => {
     mockCurrentRole = 'administrateur';
 
-    const response = await request(app)
-      .put('/api/users/6a7dc12c2f157c6b67176699')
-      .send({
-        password: 'Password123'
-      });
+    const response = await request(app).put('/api/users/6a7dc12c2f157c6b67176699').send({
+      password: 'Password123'
+    });
 
     console.log('PUT user inexistant :', response.body);
 
@@ -241,28 +194,22 @@ describe('PUT /users/:id - cas d’erreur', () => {
   it('Retourne 403 lors de la modification du username', async () => {
     mockCurrentRole = 'administrateur';
 
-    const response = await request(app)
-      .put(`/api/users/${userId}`)
-      .send({
-        username: 'nouveau@test.com'
-      });
+    const response = await request(app).put(`/api/users/${userId}`).send({
+      username: 'nouveau@test.com'
+    });
 
     console.log('PUT modification username :', response.body);
 
     expect(response.statusCode).toBe(403);
-    expect(response.body.error).toBe(
-      "Modification du nom d'utilisateur interdite"
-    );
+    expect(response.body.error).toBe("Modification du nom d'utilisateur interdite");
   });
 
   it('Retourne 400 avec un rôle invalide', async () => {
     mockCurrentRole = 'administrateur';
 
-    const response = await request(app)
-      .put(`/api/users/${userId}`)
-      .send({
-        role: 'superadmin'
-      });
+    const response = await request(app).put(`/api/users/${userId}`).send({
+      role: 'superadmin'
+    });
 
     console.log('PUT rôle invalide :', response.body);
 
@@ -271,17 +218,11 @@ describe('PUT /users/:id - cas d’erreur', () => {
   });
 });
 
-// ============================================================
-// DELETE /users/:id
-// ============================================================
-
 describe('DELETE /users/:id - cas d’erreur', () => {
-
   it('Retourne 400 avec un ID invalide', async () => {
     mockCurrentRole = 'administrateur';
 
-    const response = await request(app)
-      .delete('/api/users/123');
+    const response = await request(app).delete('/api/users/123');
 
     console.log('DELETE user ID invalide :', response.body);
 
@@ -292,8 +233,7 @@ describe('DELETE /users/:id - cas d’erreur', () => {
   it('Retourne 404 si l’utilisateur n’existe pas', async () => {
     mockCurrentRole = 'administrateur';
 
-    const response = await request(app)
-      .delete('/api/users/6a7dc12c2f157c6b67176699');
+    const response = await request(app).delete('/api/users/6a7dc12c2f157c6b67176699');
 
     console.log('DELETE user inexistant :', response.body);
 
@@ -304,17 +244,11 @@ describe('DELETE /users/:id - cas d’erreur', () => {
   it('Retourne 403 si un client tente de supprimer un autre utilisateur', async () => {
     mockCurrentRole = 'client';
 
-    const response = await request(app)
-      .delete(`/api/users/${otherUserId}`);
+    const response = await request(app).delete(`/api/users/${otherUserId}`);
 
-    console.log(
-      'DELETE autre utilisateur par client :',
-      response.body
-    );
+    console.log('DELETE autre utilisateur par client :', response.body);
 
     expect(response.statusCode).toBe(403);
-    expect(response.body.message).toBe(
-      'Accès non autorisé pour votre rôle'
-    );
+    expect(response.body.message).toBe('Accès non autorisé pour votre rôle');
   });
 });

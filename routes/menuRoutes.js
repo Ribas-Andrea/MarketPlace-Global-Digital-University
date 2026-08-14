@@ -1,11 +1,10 @@
-const express = require("express");
-const upload = require("../middleware/multer")
-const { getMenus, getMenu, createMenu, updateMenu, deleteMenu } = require("../controllers/menuController");
+const express = require('express');
+const upload = require('../middleware/multer');
+const { getMenus, getMenu, createMenu, updateMenu, deleteMenu } = require('../controllers/menuController');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const roleCheck = require('../middleware/roleMiddleware');
 const ROLES = require('../config/roles');
-
 
 /**
  * @swagger
@@ -13,7 +12,6 @@ const ROLES = require('../config/roles');
  *  name: Menus
  *  description: Gestion des menus
  */
-
 
 /**
  * @swagger
@@ -73,7 +71,7 @@ const ROLES = require('../config/roles');
  *          500:
  *              description: Erreur lors de la récupération des menus
  */
-router.get('/', getMenus); // Liste des menus
+router.get('/', getMenus);
 
 /**
  * @swagger
@@ -136,7 +134,7 @@ router.get('/', getMenus); // Liste des menus
  *          500:
  *              description: Erreur lors de la récupération du menu
  */
-router.get('/:id', getMenu); // Détail d'un menu
+router.get('/:id', getMenu);
 
 /**
  * @swagger
@@ -194,7 +192,7 @@ router.get('/:id', getMenu); // Détail d'un menu
  *          500:
  *              description: Erreur lors de la création du menu
  */
-router.post('/', auth, roleCheck(ROLES.ADMIN), upload.single('imageBurger'), createMenu); // Création d'un menu
+router.post('/', auth, roleCheck(ROLES.ADMIN), upload.single('imageBurger'), createMenu);
 
 /**
  * @swagger
@@ -251,7 +249,7 @@ router.post('/', auth, roleCheck(ROLES.ADMIN), upload.single('imageBurger'), cre
  *          500:
  *              description: Erreur lors de la modification du menu
  */
-router.put('/:id', auth, roleCheck(ROLES.ADMIN), upload.single('imageBurger'), updateMenu); // Modification d'un menu
+router.put('/:id', auth, roleCheck(ROLES.ADMIN), upload.single('imageBurger'), updateMenu);
 
 /**
  * @swagger
@@ -282,7 +280,6 @@ router.put('/:id', auth, roleCheck(ROLES.ADMIN), upload.single('imageBurger'), u
  *          500:
  *              description: Erreur lors de la suppression du menu
  */
-router.delete('/:id', auth, roleCheck(ROLES.ADMIN), deleteMenu); // Suppression d'un menu
+router.delete('/:id', auth, roleCheck(ROLES.ADMIN), deleteMenu);
 
-
-module.exports = router; 
+module.exports = router;

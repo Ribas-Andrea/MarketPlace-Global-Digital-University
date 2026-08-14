@@ -34,17 +34,10 @@ afterAll(async () => {
 });
 
 describe('Tests des erreurs Menu', () => {
-
-  // ============================================================
-  // GET /menus/:id
-  // ============================================================
-
   it('GET /menus/:id - ID invalide', async () => {
     mockCurrentRole = 'administrateur';
 
-    const response = await request(app)
-      .get('/api/menus/123')
-      .set('Authorization', 'Bearer token');
+    const response = await request(app).get('/api/menus/123').set('Authorization', 'Bearer token');
 
     console.log('GET menu - ID invalide :', response.body);
 
@@ -57,19 +50,13 @@ describe('Tests des erreurs Menu', () => {
 
     const fakeId = new mongoose.Types.ObjectId().toString();
 
-    const response = await request(app)
-      .get(`/api/menus/${fakeId}`)
-      .set('Authorization', 'Bearer token');
+    const response = await request(app).get(`/api/menus/${fakeId}`).set('Authorization', 'Bearer token');
 
     console.log('GET menu - menu inexistant :', response.body);
 
     expect(response.statusCode).toBe(404);
     expect(response.body.error).toBe('Menu non trouvé');
   });
-
-  // ============================================================
-  // POST /menus
-  // ============================================================
 
   it('POST /menus - image absente', async () => {
     mockCurrentRole = 'administrateur';
@@ -260,17 +247,10 @@ describe('Tests des erreurs Menu', () => {
     expect(response.body.error).toBe('Sauce obligatoire');
   });
 
-  // ============================================================
-  // PUT /menus/:id
-  // ============================================================
-
   it('PUT /menus/:id - ID invalide', async () => {
     mockCurrentRole = 'administrateur';
 
-    const response = await request(app)
-      .put('/api/menus/123')
-      .field('disponible', 'false')
-      .set('Authorization', 'Bearer token');
+    const response = await request(app).put('/api/menus/123').field('disponible', 'false').set('Authorization', 'Bearer token');
 
     console.log('Modification menu - ID invalide :', response.body);
 
@@ -283,10 +263,7 @@ describe('Tests des erreurs Menu', () => {
 
     const fakeId = new mongoose.Types.ObjectId().toString();
 
-    const response = await request(app)
-      .put(`/api/menus/${fakeId}`)
-      .field('disponible', 'false')
-      .set('Authorization', 'Bearer token');
+    const response = await request(app).put(`/api/menus/${fakeId}`).field('disponible', 'false').set('Authorization', 'Bearer token');
 
     console.log('Modification menu - menu inexistant :', response.body);
 
@@ -294,16 +271,10 @@ describe('Tests des erreurs Menu', () => {
     expect(response.body.error).toBe('Menu non trouvé');
   });
 
-  // ============================================================
-  // DELETE /menus/:id
-  // ============================================================
-
   it('DELETE /menus/:id - ID invalide', async () => {
     mockCurrentRole = 'administrateur';
 
-    const response = await request(app)
-      .delete('/api/menus/123')
-      .set('Authorization', 'Bearer token');
+    const response = await request(app).delete('/api/menus/123').set('Authorization', 'Bearer token');
 
     console.log('Suppression menu - ID invalide :', response.body);
 
@@ -316,9 +287,7 @@ describe('Tests des erreurs Menu', () => {
 
     const fakeId = new mongoose.Types.ObjectId().toString();
 
-    const response = await request(app)
-      .delete(`/api/menus/${fakeId}`)
-      .set('Authorization', 'Bearer token');
+    const response = await request(app).delete(`/api/menus/${fakeId}`).set('Authorization', 'Bearer token');
 
     console.log('Suppression menu - menu inexistant :', response.body);
 

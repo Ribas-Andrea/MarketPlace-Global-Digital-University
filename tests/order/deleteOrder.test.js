@@ -1,45 +1,40 @@
-process.env.NODE_ENV = "test";
+process.env.NODE_ENV = 'test';
 
-const request = require("supertest");
-const {MongoMemoryServer} = require("mongodb-memory-server");
-const mongoose = require("mongoose");
+const request = require('supertest');
+const { MongoMemoryServer } = require('mongodb-memory-server');
+const mongoose = require('mongoose');
 const Product = require('../../models/product');
 const Menu = require('../../models/menu');
 const Order = require('../../models/order');
 
-
 let mockCurrentRole = 'administrateur';
 
-
-// on fait unn moke pour simuler la connexion : 
 jest.mock('../../middleware/auth', () => {
   return (req, res, next) => {
     req.user = {
-      userId: '6a58e381df483c9e75bdbb2d', // on met n'importe quel id
+      userId: '6a58e381df483c9e75bdbb2d',
       role: mockCurrentRole
     };
     next();
   };
-})
+});
 
-
-const app = require("../../index");
-
+const app = require('../../index');
 
 let mongoServer;
 let listOrderId = [];
 
-beforeAll(async() => {
+beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
-  await mongoose.connect(mongoServer.getUri(), {dbName: 'test'});
+  await mongoose.connect(mongoServer.getUri(), { dbName: 'test' });
   const roles = ['administrateur', 'accueil', 'client'];
 
   for (let index = 0; index < roles.length; index++) {
-    console.log(index)
+    console.log(index);
     await Product.create({
       _id: '6a6b442e279ded257bfe5c9' + index.toString(),
       nom: 'Produit test',
-      prix: 5.40,
+      prix: 5.4,
       categorie: 'burgers',
       disponible: true,
       image: 'tests/imagesTest/BIGMAC.png'
@@ -47,10 +42,10 @@ beforeAll(async() => {
     await Menu.create({
       _id: '7a6b442e279ded257bfe5c9' + index.toString(),
       nom: 'Menu test',
-      prix: 11.00,
+      prix: 11.0,
       categorie: 'burgers',
       disponible: true,
-      options : {
+      options: {
         taille: 'Menu Best Of',
         accompagnement: 'Frites',
         boisson: 'Eau',
@@ -74,55 +69,40 @@ beforeAll(async() => {
         }
       ]
     });
-    console.log(order._id.toString())
+    console.log(order._id.toString());
     listOrderId.push(order._id.toString());
-  };
-})
+  }
+});
 
-afterAll(async() => {
+afterAll(async () => {
   await mongoose.disconnect();
   await mongoServer.stop();
 });
 
-
 describe('DELETE /orders/:id', () => {
-
   const roles = ['administrateur', 'accueil', 'client'];
 
-  roles.forEach((role, index) => { 
-    it(`Un ${role} peut supprimer une commande`, async() => {
+  roles.forEach((role, index) => {
+    it(`Un ${role} peut supprimer une commande`, async () => {
       mockCurrentRole = role;
-      console.log(role, listOrderId)
-    // Suppression d'une commande
-    const orderResponse = await request(app)
-      .delete(`/api/orders/${listOrderId[index]}`)
-      .set('Authorization', 'Bearer token')
-   
-    console.log(orderResponse.body);
+      console.log(role, listOrderId);
 
-      // on s'attend à ce que le statuts de la réponse soit : 
+      const orderResponse = await request(app).delete(`/api/orders/${listOrderId[index]}`).set('Authorization', 'Bearer token');
+
+      console.log(orderResponse.body);
+
       expect(orderResponse.statusCode).toBe(200);
-
-
     });
   });
 
-
   // PREPARATEUR
-  it('Un préparateur ne peut pas supprimer une commande', async() => {
+  it('Un préparateur ne peut pas supprimer une commande', async () => {
     mockCurrentRole = 'preparateur';
 
-  const orderResponse = await request(app) 
-  .delete(`/api/orders/${listOrderId[0]}`)
-  .set('Authorization', 'Bearer token'); 
+    const orderResponse = await request(app).delete(`/api/orders/${listOrderId[0]}`).set('Authorization', 'Bearer token');
 
-  console.log(orderResponse.body);
+    console.log(orderResponse.body);
 
-  expect(orderResponse.statusCode).toBe(403);
-  
+    expect(orderResponse.statusCode).toBe(403);
   });
-
-
-
 });
-

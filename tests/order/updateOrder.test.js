@@ -10,7 +10,6 @@ const Order = require('../../models/order');
 let mockCurrentRole = 'administrateur';
 let orderId;
 
-// On fait un mock pour simuler la connexion :
 jest.mock('../../middleware/auth', () => {
   return (req, res, next) => {
     req.user = {
@@ -32,7 +31,6 @@ beforeAll(async () => {
     dbName: 'test'
   });
 
-  // Création du produit
   await Product.create({
     _id: '6a6b442e279ded257bfe5c99',
     nom: 'Produit test',
@@ -42,7 +40,6 @@ beforeAll(async () => {
     image: 'tests/imagesTest/BIGMAC.png'
   });
 
-  // Création du menu
   await Menu.create({
     _id: '7a6b442e279ded257bfe5c90',
     nom: 'Menu test',
@@ -58,7 +55,6 @@ beforeAll(async () => {
     imageBurger: 'tests/imagesTest/BIGMAC.png'
   });
 
-  // Création de la commande
   const order = await Order.create({
     articles: [
       {
@@ -87,28 +83,22 @@ afterAll(async () => {
 });
 
 describe('PUT /orders/:id', () => {
-
   // ADMINISTRATEUR
   it('Un administrateur peut modifier une commande', async () => {
     mockCurrentRole = 'administrateur';
 
-    const orderResponse = await request(app)
-      .put(`/api/orders/${orderId}`)
-      .set('Authorization', 'Bearer token')
-      .send({
-        type: 'Product',
-        id_element: '6a6b442e279ded257bfe5c99',
-        quantite: 3
-      });
+    const orderResponse = await request(app).put(`/api/orders/${orderId}`).set('Authorization', 'Bearer token').send({
+      type: 'Product',
+      id_element: '6a6b442e279ded257bfe5c99',
+      quantite: 3
+    });
 
     console.log('Réponse administrateur :', orderResponse.body);
 
     expect(orderResponse.statusCode).toBe(200);
 
     expect(orderResponse.body.articles[0].type).toBe('Product');
-    expect(orderResponse.body.articles[0].id_element).toBe(
-      '6a6b442e279ded257bfe5c99'
-    );
+    expect(orderResponse.body.articles[0].id_element).toBe('6a6b442e279ded257bfe5c99');
     expect(orderResponse.body.articles[0].quantite).toBe(3);
     expect(orderResponse.body.articles[0].totalArticle).toBe(10.8);
   });
@@ -117,14 +107,11 @@ describe('PUT /orders/:id', () => {
   it('Un accueil peut modifier une commande', async () => {
     mockCurrentRole = 'accueil';
 
-    const orderResponse = await request(app)
-      .put(`/api/orders/${orderId}`)
-      .set('Authorization', 'Bearer token')
-      .send({
-        type: 'Product',
-        id_element: '6a6b442e279ded257bfe5c99',
-        quantite: 3
-      });
+    const orderResponse = await request(app).put(`/api/orders/${orderId}`).set('Authorization', 'Bearer token').send({
+      type: 'Product',
+      id_element: '6a6b442e279ded257bfe5c99',
+      quantite: 3
+    });
 
     console.log('Réponse accueil :', orderResponse.body);
 
@@ -135,14 +122,11 @@ describe('PUT /orders/:id', () => {
   it('Un préparateur ne peut pas modifier une commande', async () => {
     mockCurrentRole = 'preparateur';
 
-    const orderResponse = await request(app)
-      .put(`/api/orders/${orderId}`)
-      .set('Authorization', 'Bearer token')
-      .send({
-        type: 'Product',
-        id_element: '6a6b442e279ded257bfe5c99',
-        quantite: 3
-      });
+    const orderResponse = await request(app).put(`/api/orders/${orderId}`).set('Authorization', 'Bearer token').send({
+      type: 'Product',
+      id_element: '6a6b442e279ded257bfe5c99',
+      quantite: 3
+    });
 
     console.log('Réponse préparateur :', orderResponse.body);
 
@@ -153,14 +137,11 @@ describe('PUT /orders/:id', () => {
   it('Un client peut modifier une commande', async () => {
     mockCurrentRole = 'client';
 
-    const orderResponse = await request(app)
-      .put(`/api/orders/${orderId}`)
-      .set('Authorization', 'Bearer token')
-      .send({
-        type: 'Product',
-        id_element: '6a6b442e279ded257bfe5c99',
-        quantite: 3
-      });
+    const orderResponse = await request(app).put(`/api/orders/${orderId}`).set('Authorization', 'Bearer token').send({
+      type: 'Product',
+      id_element: '6a6b442e279ded257bfe5c99',
+      quantite: 3
+    });
 
     console.log('Réponse client :', orderResponse.body);
 

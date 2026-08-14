@@ -1,42 +1,36 @@
-process.env.NODE_ENV = "test";
+process.env.NODE_ENV = 'test';
 
-const request = require("supertest");
-const {MongoMemoryServer} = require("mongodb-memory-server");
-const mongoose = require("mongoose");
-
+const request = require('supertest');
+const { MongoMemoryServer } = require('mongodb-memory-server');
+const mongoose = require('mongoose');
 
 let mockCurrentRole = 'administrateur';
 
-
-// on fait unn moke pour simuler la connexion : 
 jest.mock('../../middleware/auth', () => {
   return (req, res, next) => {
     req.user = {
-      userId: '6a58e381df483c9e75bdbb2d', // on met n'importe quel id
+      userId: '6a58e381df483c9e75bdbb2d',
       role: mockCurrentRole
     };
     next();
   };
-})
+});
 
-
-const app = require("../../index");
-
+const app = require('../../index');
 
 let mongoServer;
 
-beforeAll(async() => {
+beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
-  await mongoose.connect(mongoServer.getUri(), {dbName: 'test'});
-})
+  await mongoose.connect(mongoServer.getUri(), { dbName: 'test' });
+});
 
-afterAll(async() => {
+afterAll(async () => {
   await mongoose.disconnect();
   await mongoServer.stop();
 });
 
 describe('DELETE /products/:id', () => {
-
   let productId;
 
   beforeEach(async () => {
@@ -61,9 +55,7 @@ describe('DELETE /products/:id', () => {
   it('Un administrateur peut supprimer un produit', async () => {
     mockCurrentRole = 'administrateur';
 
-    const response = await request(app)
-      .delete(`/api/products/${productId}`)
-      .set('Authorization', 'Bearer token');
+    const response = await request(app).delete(`/api/products/${productId}`).set('Authorization', 'Bearer token');
 
     console.log(response.body);
 
@@ -74,9 +66,7 @@ describe('DELETE /products/:id', () => {
   it("Un membre de l'accueil ne peut pas supprimer un produit", async () => {
     mockCurrentRole = 'accueil';
 
-    const response = await request(app)
-      .delete(`/api/products/${productId}`)
-      .set('Authorization', 'Bearer token');
+    const response = await request(app).delete(`/api/products/${productId}`).set('Authorization', 'Bearer token');
 
     console.log(response.body);
 
@@ -87,9 +77,7 @@ describe('DELETE /products/:id', () => {
   it('Un préparateur ne peut pas supprimer un produit', async () => {
     mockCurrentRole = 'preparateur';
 
-    const response = await request(app)
-      .delete(`/api/products/${productId}`)
-      .set('Authorization', 'Bearer token');
+    const response = await request(app).delete(`/api/products/${productId}`).set('Authorization', 'Bearer token');
 
     console.log(response.body);
 
@@ -100,9 +88,7 @@ describe('DELETE /products/:id', () => {
   it('Un client ne peut pas supprimer un produit', async () => {
     mockCurrentRole = 'client';
 
-    const response = await request(app)
-      .delete(`/api/products/${productId}`)
-      .set('Authorization', 'Bearer token');
+    const response = await request(app).delete(`/api/products/${productId}`).set('Authorization', 'Bearer token');
 
     console.log(response.body);
 

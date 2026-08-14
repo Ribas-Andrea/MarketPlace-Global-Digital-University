@@ -1,47 +1,41 @@
-process.env.NODE_ENV = "test";
+process.env.NODE_ENV = 'test';
 
-const request = require("supertest");
-const {MongoMemoryServer} = require("mongodb-memory-server");
-const mongoose = require("mongoose");
-
+const request = require('supertest');
+const { MongoMemoryServer } = require('mongodb-memory-server');
+const mongoose = require('mongoose');
 
 let mockCurrentRole = 'administrateur';
 
-
-// on fait unn moke pour simuler la connexion : 
 jest.mock('../../middleware/auth', () => {
   return (req, res, next) => {
     req.user = {
-      userId: '6a58e381df483c9e75bdbb2d', // on met n'importe quel id
+      userId: '6a58e381df483c9e75bdbb2d',
       role: mockCurrentRole
     };
     next();
   };
-})
+});
 
-const app = require("../../index");
-
+const app = require('../../index');
 
 let mongoServer;
 
-beforeAll(async() => {
+beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
-  await mongoose.connect(mongoServer.getUri(), {dbName: 'test'});
-})
+  await mongoose.connect(mongoServer.getUri(), { dbName: 'test' });
+});
 
-afterAll(async() => {
+afterAll(async () => {
   await mongoose.disconnect();
   await mongoServer.stop();
 });
 
 describe('GET /menus', () => {
-
- let menuId;
+  let menuId;
 
   beforeAll(async () => {
     mockCurrentRole = 'administrateur';
 
-    // Création du premier produit
     await request(app)
       .post('/api/menus')
       .field('nom', 'Mon menu 1')
@@ -55,7 +49,6 @@ describe('GET /menus', () => {
       .attach('imageBurger', 'tests/imagesTest/BIGMAC.png')
       .set('Authorization', 'Bearer token');
 
-    // Création du deuxième produit
     await request(app)
       .post('/api/menus')
       .field('nom', 'Mon menu 2')
@@ -69,7 +62,6 @@ describe('GET /menus', () => {
       .attach('imageBurger', 'tests/imagesTest/BIGMAC.png')
       .set('Authorization', 'Bearer token');
 
-    // Création du troisième produit
     await request(app)
       .post('/api/menus')
       .field('nom', 'Mon menu 3')
@@ -82,30 +74,21 @@ describe('GET /menus', () => {
       .field('sauce', 'Chinoise')
       .attach('imageBurger', 'tests/imagesTest/BIGMAC.png')
       .set('Authorization', 'Bearer token');
-
   });
 
   const roles = ['administrateur', 'accueil', 'preparateur', 'client'];
 
-  roles.forEach((role) => { 
-    
-
-   it(`Un ${role} peut afficher la liste des menus`, async () => {
+  roles.forEach((role) => {
+    it(`Un ${role} peut afficher la liste des menus`, async () => {
       mockCurrentRole = role;
-      // Récupération du menu
-      const menuResponse = await request(app)
-        .get('/api/menus/')
-        .set('Authorization', 'Bearer token');
+
+      const menuResponse = await request(app).get('/api/menus/').set('Authorization', 'Bearer token');
 
       console.log(menuResponse.body);
 
-      // On vérifie la réponse
       expect(menuResponse.statusCode).toBe(200);
       expect(menuResponse.body.menus).toHaveLength(3);
 
-      // on vérifie les réponses : 
-
-      // Mon Menu 1
       expect(menuResponse.body.menus[0].nom).toBe('Mon menu 1');
       expect(menuResponse.body.menus[0].prix).toBe(10.8);
       expect(menuResponse.body.menus[0].categorie).toBe('burgers');
@@ -116,8 +99,6 @@ describe('GET /menus', () => {
       expect(menuResponse.body.menus[0].options.sauce).toBe('Barbecue');
       expect(menuResponse.body.menus[0].imageBurger).toBeDefined();
 
-
-      // Mon menu 2
       expect(menuResponse.body.menus[1].nom).toBe('Mon menu 2');
       expect(menuResponse.body.menus[1].prix).toBe(6.8);
       expect(menuResponse.body.menus[1].categorie).toBe('burgers');
@@ -128,7 +109,6 @@ describe('GET /menus', () => {
       expect(menuResponse.body.menus[1].options.sauce).toBe('Barbecue');
       expect(menuResponse.body.menus[1].imageBurger).toBeDefined();
 
-      // Mon Menu 3
       expect(menuResponse.body.menus[2].nom).toBe('Mon menu 3');
       expect(menuResponse.body.menus[2].prix).toBe(11.8);
       expect(menuResponse.body.menus[2].categorie).toBe('burgers');
@@ -140,5 +120,4 @@ describe('GET /menus', () => {
       expect(menuResponse.body.menus[2].imageBurger).toBeDefined();
     });
   });
-}); 
-
+});

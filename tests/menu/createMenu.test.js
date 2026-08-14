@@ -1,44 +1,38 @@
-process.env.NODE_ENV = "test";
+process.env.NODE_ENV = 'test';
 
-const request = require("supertest");
-const {MongoMemoryServer} = require("mongodb-memory-server");
-const mongoose = require("mongoose");
+const request = require('supertest');
+const { MongoMemoryServer } = require('mongodb-memory-server');
+const mongoose = require('mongoose');
 
 let mockCurrentRole = 'administrateur';
 
-
-// on fait unn moke pour simuler la connexion : 
 jest.mock('../../middleware/auth', () => {
   return (req, res, next) => {
     req.user = {
-      userId: '6a58e381df483c9e75bdbb2d', // on met n'importe quel id
+      userId: '6a58e381df483c9e75bdbb2d',
       role: mockCurrentRole
     };
     next();
   };
-})
+});
 
-const app = require("../../index");
-
+const app = require('../../index');
 
 let mongoServer;
 
-beforeAll(async() => {
+beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
-  await mongoose.connect(mongoServer.getUri(), {dbName: 'test'});
-})
+  await mongoose.connect(mongoServer.getUri(), { dbName: 'test' });
+});
 
-afterAll(async() => {
+afterAll(async () => {
   await mongoose.disconnect();
   await mongoServer.stop();
 });
 
-
-
 describe('POST /menus', () => {
-
   // ADMIN
-  it('Un administrateur peut créer un menu', async() => {
+  it('Un administrateur peut créer un menu', async () => {
     mockCurrentRole = 'administrateur';
     const menuResponse = await request(app)
       .post('/api/menus')
@@ -53,60 +47,50 @@ describe('POST /menus', () => {
       .attach('imageBurger', 'tests/imagesTest/BIGMAC.png')
       .set('Authorization', 'Bearer token');
 
-      console.log(menuResponse.body);
+    console.log(menuResponse.body);
 
-        // on s'attend à ce que le statuts de la réponse soit : 
-        expect(menuResponse.statusCode).toBe(201);
-        // on vérifie le menu : 
-        expect(menuResponse.body.nom).toBe('Mon menu');
-        expect(menuResponse.body.prix).toBe(10.8);
-        expect(menuResponse.body.categorie).toBe('burgers');
-        expect(menuResponse.body.disponible).toBe(true);
-        expect(menuResponse.body.options.taille).toBe('Menu Best Of');
-        expect(menuResponse.body.options.accompagnement).toBe('Frites');
-        expect(menuResponse.body.options.boisson).toBe('Coca');
-        expect(menuResponse.body.options.sauce).toBe('Barbecue');
-        expect(menuResponse.body.imageBurger).toBeDefined();
+    expect(menuResponse.statusCode).toBe(201);
+
+    expect(menuResponse.body.nom).toBe('Mon menu');
+    expect(menuResponse.body.prix).toBe(10.8);
+    expect(menuResponse.body.categorie).toBe('burgers');
+    expect(menuResponse.body.disponible).toBe(true);
+    expect(menuResponse.body.options.taille).toBe('Menu Best Of');
+    expect(menuResponse.body.options.accompagnement).toBe('Frites');
+    expect(menuResponse.body.options.boisson).toBe('Coca');
+    expect(menuResponse.body.options.sauce).toBe('Barbecue');
+    expect(menuResponse.body.imageBurger).toBeDefined();
   });
 
   // ACCUEIL
-  it('Un membre de l’accueil ne peut pas créer un menu', async() => {
+  it('Un membre de l’accueil ne peut pas créer un menu', async () => {
     mockCurrentRole = 'accueil';
 
-  const menuResponse = await request(app) 
-  .post('/api/menus') 
-  .set('Authorization', 'Bearer token'); 
+    const menuResponse = await request(app).post('/api/menus').set('Authorization', 'Bearer token');
 
-  console.log(menuResponse.body);
+    console.log(menuResponse.body);
 
-  expect(menuResponse.statusCode).toBe(403);
-  
+    expect(menuResponse.statusCode).toBe(403);
   });
   // PREPARATEUR
-  it('Un préparateur ne peut pas créer un menu', async() => {
+  it('Un préparateur ne peut pas créer un menu', async () => {
     mockCurrentRole = 'preparateur';
 
-  const menuResponse = await request(app) 
-  .post('/api/menus') 
-  .set('Authorization', 'Bearer token'); 
+    const menuResponse = await request(app).post('/api/menus').set('Authorization', 'Bearer token');
 
-  console.log(menuResponse.body);
+    console.log(menuResponse.body);
 
-  expect(menuResponse.statusCode).toBe(403);
-  
+    expect(menuResponse.statusCode).toBe(403);
   });
 
   // CLIENT
-  it('Un client ne peut pas créer un menu', async() => {
+  it('Un client ne peut pas créer un menu', async () => {
     mockCurrentRole = 'client';
 
-  const menuResponse = await request(app) 
-  .post('/api/menus') 
-  .set('Authorization', 'Bearer token'); 
+    const menuResponse = await request(app).post('/api/menus').set('Authorization', 'Bearer token');
 
-  console.log(menuResponse.body);
+    console.log(menuResponse.body);
 
-  expect(menuResponse.statusCode).toBe(403);
-  
+    expect(menuResponse.statusCode).toBe(403);
   });
 });
