@@ -196,7 +196,7 @@ try {
   
   const menu = await Menu.findById(id);
   if(!menu){
-  return res.status(404).json({error: 'Produit non trouvé'});
+  return res.status(404).json({error: 'Menu non trouvé'});
   }
 
   const cheminImageBurger = path.join("uploads", menu.imageBurger);

@@ -35,10 +35,16 @@ afterAll(async () => {
 
 describe('Tests des erreurs Product', () => {
 
-  // Vérifie qu'un ID invalide renvoie une erreur 400 lors de la récupération d'un produit.
+  // ============================================================
+  // GET /products/:id
+  // ============================================================
+
   it('GET /products/:id - ID invalide', async () => {
+    mockCurrentRole = 'administrateur';
+
     const response = await request(app)
-      .get('/api/products/123');
+      .get('/api/products/123')
+      .set('Authorization', 'Bearer token');
 
     console.log('GET produit - ID invalide :', response.body);
 
@@ -46,12 +52,14 @@ describe('Tests des erreurs Product', () => {
     expect(response.body.error).toBe('ID invalide');
   });
 
-  // Vérifie qu'un ID valide mais inexistant renvoie une erreur 404.
   it('GET /products/:id - produit inexistant', async () => {
+    mockCurrentRole = 'administrateur';
+
     const fakeId = new mongoose.Types.ObjectId().toString();
 
     const response = await request(app)
-      .get(`/api/products/${fakeId}`);
+      .get(`/api/products/${fakeId}`)
+      .set('Authorization', 'Bearer token');
 
     console.log('GET produit - produit inexistant :', response.body);
 
@@ -59,8 +67,13 @@ describe('Tests des erreurs Product', () => {
     expect(response.body.error).toBe('Produit non trouvé');
   });
 
-  // Vérifie qu'un produit ne peut pas être créé sans image.
+  // ============================================================
+  // POST /products
+  // ============================================================
+
   it('POST /products - image absente', async () => {
+    mockCurrentRole = 'administrateur';
+
     const response = await request(app)
       .post('/api/products')
       .field('nom', 'Produit test')
@@ -75,8 +88,9 @@ describe('Tests des erreurs Product', () => {
     expect(response.body.error).toBe('Image obligatoire');
   });
 
-  // Vérifie qu'un produit ne peut pas être créé sans catégorie.
   it('POST /products - catégorie absente', async () => {
+    mockCurrentRole = 'administrateur';
+
     const response = await request(app)
       .post('/api/products')
       .field('nom', 'Produit test')
@@ -91,8 +105,9 @@ describe('Tests des erreurs Product', () => {
     expect(response.body.error).toBe('Catégorie obligatoire');
   });
 
-  // Vérifie qu'un produit ne peut pas être créé sans nom.
   it('POST /products - nom absent', async () => {
+    mockCurrentRole = 'administrateur';
+
     const response = await request(app)
       .post('/api/products')
       .field('prix', '8.8')
@@ -107,8 +122,9 @@ describe('Tests des erreurs Product', () => {
     expect(response.body.error).toBe('Nom obligatoire');
   });
 
-  // Vérifie qu'un produit ne peut pas être créé sans prix.
   it('POST /products - prix absent', async () => {
+    mockCurrentRole = 'administrateur';
+
     const response = await request(app)
       .post('/api/products')
       .field('nom', 'Produit test')
@@ -123,8 +139,9 @@ describe('Tests des erreurs Product', () => {
     expect(response.body.error).toBe('Prix obligatoire');
   });
 
-  // Vérifie qu'un produit ne peut pas être créé sans disponibilité.
   it('POST /products - disponibilité absente', async () => {
+    mockCurrentRole = 'administrateur';
+
     const response = await request(app)
       .post('/api/products')
       .field('nom', 'Produit test')
@@ -139,8 +156,13 @@ describe('Tests des erreurs Product', () => {
     expect(response.body.error).toBe('Disponibilité obligatoire');
   });
 
-  // Vérifie qu'un ID invalide renvoie une erreur 400 lors de la modification.
+  // ============================================================
+  // PUT /products/:id
+  // ============================================================
+
   it('PUT /products/:id - ID invalide', async () => {
+    mockCurrentRole = 'administrateur';
+
     const response = await request(app)
       .put('/api/products/123')
       .field('disponible', 'false')
@@ -152,8 +174,9 @@ describe('Tests des erreurs Product', () => {
     expect(response.body.error).toBe('ID invalide');
   });
 
-  // Vérifie qu'un ID valide mais inexistant renvoie une erreur 404 lors de la modification.
   it('PUT /products/:id - produit inexistant', async () => {
+    mockCurrentRole = 'administrateur';
+
     const fakeId = new mongoose.Types.ObjectId().toString();
 
     const response = await request(app)
@@ -167,8 +190,13 @@ describe('Tests des erreurs Product', () => {
     expect(response.body.error).toBe('Produit non trouvé');
   });
 
-  // Vérifie qu'un ID invalide renvoie une erreur 400 lors de la suppression.
+  // ============================================================
+  // DELETE /products/:id
+  // ============================================================
+
   it('DELETE /products/:id - ID invalide', async () => {
+    mockCurrentRole = 'administrateur';
+
     const response = await request(app)
       .delete('/api/products/123')
       .set('Authorization', 'Bearer token');
@@ -179,8 +207,9 @@ describe('Tests des erreurs Product', () => {
     expect(response.body.error).toBe('ID invalide');
   });
 
-  // Vérifie qu'un ID valide mais inexistant renvoie une erreur 404 lors de la suppression.
   it('DELETE /products/:id - produit inexistant', async () => {
+    mockCurrentRole = 'administrateur';
+
     const fakeId = new mongoose.Types.ObjectId().toString();
 
     const response = await request(app)

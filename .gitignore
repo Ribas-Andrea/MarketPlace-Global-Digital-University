@@ -1,7 +1,11 @@
-# Dépendances 
-node_modules
+# Dépendances
+node_modules/
 
 # Configuration
 .env
 
+# Tests
 coverage/
+
+# Fichiers uploadés
+uploads/

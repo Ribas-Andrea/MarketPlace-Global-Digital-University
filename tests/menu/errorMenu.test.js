@@ -35,10 +35,16 @@ afterAll(async () => {
 
 describe('Tests des erreurs Menu', () => {
 
-  // Vérifie qu'un ID invalide renvoie une erreur 400 lors de la récupération d'un menu.
+  // ============================================================
+  // GET /menus/:id
+  // ============================================================
+
   it('GET /menus/:id - ID invalide', async () => {
+    mockCurrentRole = 'administrateur';
+
     const response = await request(app)
-      .get('/api/menus/123');
+      .get('/api/menus/123')
+      .set('Authorization', 'Bearer token');
 
     console.log('GET menu - ID invalide :', response.body);
 
@@ -46,12 +52,14 @@ describe('Tests des erreurs Menu', () => {
     expect(response.body.error).toBe('ID invalide');
   });
 
-  // Vérifie qu'un ID valide mais inexistant renvoie une erreur 404.
   it('GET /menus/:id - menu inexistant', async () => {
+    mockCurrentRole = 'administrateur';
+
     const fakeId = new mongoose.Types.ObjectId().toString();
 
     const response = await request(app)
-      .get(`/api/menus/${fakeId}`);
+      .get(`/api/menus/${fakeId}`)
+      .set('Authorization', 'Bearer token');
 
     console.log('GET menu - menu inexistant :', response.body);
 
@@ -59,8 +67,13 @@ describe('Tests des erreurs Menu', () => {
     expect(response.body.error).toBe('Menu non trouvé');
   });
 
-  // Vérifie qu'un menu ne peut pas être créé sans image.
+  // ============================================================
+  // POST /menus
+  // ============================================================
+
   it('POST /menus - image absente', async () => {
+    mockCurrentRole = 'administrateur';
+
     const response = await request(app)
       .post('/api/menus')
       .field('nom', 'Menu test')
@@ -79,8 +92,9 @@ describe('Tests des erreurs Menu', () => {
     expect(response.body.error).toBe('Image obligatoire');
   });
 
-  // Vérifie qu'un menu ne peut pas être créé sans catégorie.
   it('POST /menus - catégorie absente', async () => {
+    mockCurrentRole = 'administrateur';
+
     const response = await request(app)
       .post('/api/menus')
       .field('nom', 'Menu test')
@@ -99,8 +113,9 @@ describe('Tests des erreurs Menu', () => {
     expect(response.body.error).toBe('Catégorie obligatoire');
   });
 
-  // Vérifie qu'un menu ne peut pas être créé sans nom.
   it('POST /menus - nom absent', async () => {
+    mockCurrentRole = 'administrateur';
+
     const response = await request(app)
       .post('/api/menus')
       .field('prix', '10.8')
@@ -119,8 +134,9 @@ describe('Tests des erreurs Menu', () => {
     expect(response.body.error).toBe('Nom obligatoire');
   });
 
-  // Vérifie qu'un menu ne peut pas être créé sans prix.
   it('POST /menus - prix absent', async () => {
+    mockCurrentRole = 'administrateur';
+
     const response = await request(app)
       .post('/api/menus')
       .field('nom', 'Menu test')
@@ -139,8 +155,9 @@ describe('Tests des erreurs Menu', () => {
     expect(response.body.error).toBe('Prix obligatoire');
   });
 
-  // Vérifie qu'un menu ne peut pas être créé sans disponibilité.
   it('POST /menus - disponibilité absente', async () => {
+    mockCurrentRole = 'administrateur';
+
     const response = await request(app)
       .post('/api/menus')
       .field('nom', 'Menu test')
@@ -159,8 +176,9 @@ describe('Tests des erreurs Menu', () => {
     expect(response.body.error).toBe('Disponibilité obligatoire');
   });
 
-  // Vérifie qu'un menu ne peut pas être créé sans taille.
   it('POST /menus - taille absente', async () => {
+    mockCurrentRole = 'administrateur';
+
     const response = await request(app)
       .post('/api/menus')
       .field('nom', 'Menu test')
@@ -179,8 +197,9 @@ describe('Tests des erreurs Menu', () => {
     expect(response.body.error).toBe('Taille obligatoire');
   });
 
-  // Vérifie qu'un menu ne peut pas être créé sans accompagnement.
   it('POST /menus - accompagnement absent', async () => {
+    mockCurrentRole = 'administrateur';
+
     const response = await request(app)
       .post('/api/menus')
       .field('nom', 'Menu test')
@@ -199,8 +218,9 @@ describe('Tests des erreurs Menu', () => {
     expect(response.body.error).toBe('Accompagnement obligatoire');
   });
 
-  // Vérifie qu'un menu ne peut pas être créé sans boisson.
   it('POST /menus - boisson absente', async () => {
+    mockCurrentRole = 'administrateur';
+
     const response = await request(app)
       .post('/api/menus')
       .field('nom', 'Menu test')
@@ -219,8 +239,9 @@ describe('Tests des erreurs Menu', () => {
     expect(response.body.error).toBe('Boisson obligatoire');
   });
 
-  // Vérifie qu'un menu ne peut pas être créé sans sauce.
   it('POST /menus - sauce absente', async () => {
+    mockCurrentRole = 'administrateur';
+
     const response = await request(app)
       .post('/api/menus')
       .field('nom', 'Menu test')
@@ -239,8 +260,13 @@ describe('Tests des erreurs Menu', () => {
     expect(response.body.error).toBe('Sauce obligatoire');
   });
 
-  // Vérifie qu'un ID invalide renvoie une erreur 400 lors de la modification.
+  // ============================================================
+  // PUT /menus/:id
+  // ============================================================
+
   it('PUT /menus/:id - ID invalide', async () => {
+    mockCurrentRole = 'administrateur';
+
     const response = await request(app)
       .put('/api/menus/123')
       .field('disponible', 'false')
@@ -252,8 +278,9 @@ describe('Tests des erreurs Menu', () => {
     expect(response.body.error).toBe('ID invalide');
   });
 
-  // Vérifie qu'un ID valide mais inexistant renvoie une erreur 404 lors de la modification.
   it('PUT /menus/:id - menu inexistant', async () => {
+    mockCurrentRole = 'administrateur';
+
     const fakeId = new mongoose.Types.ObjectId().toString();
 
     const response = await request(app)
@@ -267,8 +294,13 @@ describe('Tests des erreurs Menu', () => {
     expect(response.body.error).toBe('Menu non trouvé');
   });
 
-  // Vérifie qu'un ID invalide renvoie une erreur 400 lors de la suppression.
+  // ============================================================
+  // DELETE /menus/:id
+  // ============================================================
+
   it('DELETE /menus/:id - ID invalide', async () => {
+    mockCurrentRole = 'administrateur';
+
     const response = await request(app)
       .delete('/api/menus/123')
       .set('Authorization', 'Bearer token');
@@ -279,8 +311,9 @@ describe('Tests des erreurs Menu', () => {
     expect(response.body.error).toBe('ID invalide');
   });
 
-  // Vérifie qu'un ID valide mais inexistant renvoie une erreur 404 lors de la suppression.
   it('DELETE /menus/:id - menu inexistant', async () => {
+    mockCurrentRole = 'administrateur';
+
     const fakeId = new mongoose.Types.ObjectId().toString();
 
     const response = await request(app)
@@ -290,6 +323,6 @@ describe('Tests des erreurs Menu', () => {
     console.log('Suppression menu - menu inexistant :', response.body);
 
     expect(response.statusCode).toBe(404);
-    expect(response.body.error).toBe('Produit non trouvé');
+    expect(response.body.error).toBe('Menu non trouvé');
   });
 });
