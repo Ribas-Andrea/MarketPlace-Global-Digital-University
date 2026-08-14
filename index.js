@@ -6,6 +6,8 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 
 const app = express();
+
+app.set('trust proxy', 1);
 const setupSwagger = require('./swaggerConfig');
 app.use(helmet());
 app.use(cors());
