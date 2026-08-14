@@ -31,7 +31,6 @@ const ROLES = require('../config/roles');
  *             required:
  *               - username
  *               - password
- *               - role
  *             properties:
  *               username:
  *                 type: string
@@ -39,8 +38,6 @@ const ROLES = require('../config/roles');
  *               password:
  *                 type: string
  *                 format: password
- *               role:
- *                 type: string
  *     responses:
  *       200:
  *         description: Authentification réussie
@@ -171,7 +168,6 @@ router.get('/:id', auth, roleCheck(ROLES.ADMIN), getUser); // Récupérer un uti
  *             required:
  *               - username
  *               - password
- *               - role
  *             properties:
  *               username:
  *                 type: string
@@ -179,8 +175,6 @@ router.get('/:id', auth, roleCheck(ROLES.ADMIN), getUser); // Récupérer un uti
  *               password:
  *                 type: string
  *                 format: password
- *               role:
- *                 type: string
  *     responses:
  *       200:
  *         description: Authentification réussie
@@ -221,9 +215,6 @@ router.post('/login', body('username').isEmail(), login); // Connexion
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - password
- *               - role
  *             properties:
  *               password:
  *                 type: string
