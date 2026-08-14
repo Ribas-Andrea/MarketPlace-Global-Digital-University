@@ -2,7 +2,7 @@
   "name": "marketplace",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./index.js",
   "scripts": {
     "test": "jest",
     "test:mocha": "mocha"
