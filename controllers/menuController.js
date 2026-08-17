@@ -39,33 +39,25 @@ exports.createMenu = async (req, res) => {
     }
 
     if (!categorie) return res.status(400).json({ error: 'Catégorie obligatoire' });
+    if (!nom) return res.status(400).json({ error: 'Nom obligatoire' });
+    if (!prix) return res.status(400).json({ error: 'Prix obligatoire' });
+    if (disponible === undefined) return res.status(400).json({ error: 'Disponibilité obligatoire' });
+    if (!taille) return res.status(400).json({ error: 'Taille obligatoire' });
+    if (!accompagnement) return res.status(400).json({ error: 'Accompagnement obligatoire' });
+    if (!boisson) return res.status(400).json({ error: 'Boisson obligatoire' });
+    if (!sauce) return res.status(400).json({ error: 'Sauce obligatoire' });
 
-    const dossier = `uploads/${categorie}`;
+    const dossier = path.join('uploads', categorie);
 
     if (!fs.existsSync(dossier)) {
       fs.mkdirSync(dossier, { recursive: true });
     }
 
-    const ancienChemin = req.file.path;
     const nouveauChemin = path.join(dossier, req.file.filename);
 
-    fs.renameSync(ancienChemin, nouveauChemin);
+    fs.renameSync(req.file.path, nouveauChemin);
 
     const imageBurger = `${categorie}/${req.file.filename}`;
-
-    if (!nom) return res.status(400).json({ error: 'Nom obligatoire' });
-
-    if (!prix) return res.status(400).json({ error: 'Prix obligatoire' });
-
-    if (disponible === undefined) return res.status(400).json({ error: 'Disponibilité obligatoire' });
-
-    if (!taille) return res.status(400).json({ error: 'Taille obligatoire' });
-
-    if (!accompagnement) return res.status(400).json({ error: 'Accompagnement obligatoire' });
-
-    if (!boisson) return res.status(400).json({ error: 'Boisson obligatoire' });
-
-    if (!sauce) return res.status(400).json({ error: 'Sauce obligatoire' });
 
     const menu = new Menu({
       imageBurger,
@@ -82,6 +74,7 @@ exports.createMenu = async (req, res) => {
     });
 
     const savedMenu = await menu.save();
+
     res.status(201).json(savedMenu);
   } catch (err) {
     if (req.file && fs.existsSync(req.file.path)) {
@@ -94,46 +87,69 @@ exports.createMenu = async (req, res) => {
 };
 
 exports.updateMenu = async (req, res) => {
+  let nouveauChemin;
+
   try {
     const { id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ error: 'ID invalide' });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: 'ID invalide' });
+    }
 
     const { nom, prix, categorie, disponible, taille, accompagnement, boisson, sauce } = req.body;
 
     const menu = await Menu.findById(id);
+
     if (!menu) {
       return res.status(404).json({ error: 'Menu non trouvé' });
     }
 
-    let imageBurger;
-
-    if (req.file) {
-      imageBurger = `${categorie || menu.categorie}/${req.file.filename}`;
-    }
-
     if (nom) menu.nom = nom;
     if (prix) menu.prix = prix;
-
     if (categorie) menu.categorie = categorie;
-
-    if (imageBurger) menu.imageBurger = imageBurger;
-
     if (disponible !== undefined) menu.disponible = disponible;
+    if (taille) menu.options.taille = taille;
+    if (accompagnement) menu.options.accompagnement = accompagnement;
+    if (boisson) menu.options.boisson = boisson;
+    if (sauce) menu.options.sauce = sauce;
 
-    if (taille) menu.taille = taille;
+    if (req.file) {
+      const nouvelleCategorie = categorie || menu.categorie;
 
-    if (accompagnement) menu.accompagnement = accompagnement;
+      const dossier = path.join('uploads', nouvelleCategorie);
 
-    if (boisson) menu.boisson = boisson;
+      if (!fs.existsSync(dossier)) {
+        fs.mkdirSync(dossier, { recursive: true });
+      }
 
-    if (sauce) menu.sauce = sauce;
+      nouveauChemin = path.join(dossier, req.file.filename);
+
+      fs.renameSync(req.file.path, nouveauChemin);
+
+
+      const ancienneImage = path.join('uploads', menu.imageBurger);
+
+      if (fs.existsSync(ancienneImage)) {
+        fs.unlinkSync(ancienneImage);
+      }
+
+
+      menu.imageBurger = `${nouvelleCategorie}/${req.file.filename}`;
+    }
 
     const updatedMenu = await menu.save();
-    res.json(updatedMenu);
+
+    res.status(200).json(updatedMenu);
   } catch (err) {
+    if (nouveauChemin && fs.existsSync(nouveauChemin)) {
+      fs.unlinkSync(nouveauChemin);
+    }
+
     console.error(err);
-    res.status(500).json({ error: 'erreur lors de la modification du menu' });
+
+    res.status(500).json({
+      error: 'Erreur lors de la modification du menu'
+    });
   }
 };
 

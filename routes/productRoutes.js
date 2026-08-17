@@ -21,33 +21,35 @@ const ROLES = require('../config/roles');
  *      tags: [Produits]
  *      responses:
  *          200:
- *            description: Affichage des produits réussie
+ *            description: Affichage des produits réussi
  *            content:
  *              application/json:
  *                schema:
- *                  type: array
- *                  items:
- *                    type: object
- *                    properties:
- *                      _id:
- *                        type: string
- *                      image:
- *                        type: string
- *                        format: binary
- *                      nom:
- *                        type: string
- *                      prix:
- *                        type: number
- *                      categorie:
- *                        type: string
- *                      disponible:
- *                        type: boolean
- *                      createdAt:
- *                        type: string
- *                        format: date-time
- *                      updatedAt:
- *                        type: string
- *                        format: date-time
+ *                  type: object
+ *                  properties:
+ *                    products:
+ *                      type: array
+ *                      items:
+ *                        type: object
+ *                        properties:
+ *                          _id:
+ *                            type: string
+ *                          image:
+ *                            type: string
+ *                          nom:
+ *                            type: string
+ *                          prix:
+ *                            type: number
+ *                          categorie:
+ *                            type: string
+ *                          disponible:
+ *                            type: boolean
+ *                          createdAt:
+ *                            type: string
+ *                            format: date-time
+ *                          updatedAt:
+ *                            type: string
+ *                            format: date-time
  *          500:
  *              description: Erreur lors de la récupération des produits
  */
@@ -68,39 +70,39 @@ router.get('/', getProducts);
  *           type: string
  *      responses:
  *          200:
- *            description: Affichage du produit réussie
+ *            description: Affichage du produit réussi
  *            content:
  *              application/json:
  *                schema:
- *                  type: array
- *                  items:
- *                    type: object
- *                    properties:
- *                      _id:
- *                        type: string
- *                      image:
- *                        type: string
- *                        format: binary
- *                      nom:
- *                        type: string
- *                      prix:
- *                        type: number
- *                      categorie:
- *                        type: string
- *                      disponible:
- *                        type: boolean
- *                      createdAt:
- *                        type: string
- *                        format: date-time
- *                      updatedAt:
- *                        type: string
- *                        format: date-time
+ *                  type: object
+ *                  properties:
+ *                    product:
+ *                      type: object
+ *                      properties:
+ *                        _id:
+ *                          type: string
+ *                        image:
+ *                          type: string
+ *                        nom:
+ *                          type: string
+ *                        prix:
+ *                          type: number
+ *                        categorie:
+ *                          type: string
+ *                        disponible:
+ *                          type: boolean
+ *                        createdAt:
+ *                          type: string
+ *                          format: date-time
+ *                        updatedAt:
+ *                          type: string
+ *                          format: date-time
  *          400:
  *              description: ID invalide
  *          404:
  *              description: Produit non trouvé
  *          500:
- *              description: Erreur lors de la création du produit
+ *              description: Erreur lors de la récupération du produit
  */
 router.get('/:id', getProduct);
 
@@ -119,11 +121,11 @@ router.get('/:id', getProduct);
  *            schema:
  *              type: object
  *              required:
- *                  -nom
- *                  -image
- *                  -prix
- *                  -categorie
- *                  -disponible
+ *                  - image
+ *                  - nom
+ *                  - prix
+ *                  - categorie
+ *                  - disponible
  *              properties:
  *                  image:
  *                    type: string
@@ -136,12 +138,6 @@ router.get('/:id', getProduct);
  *                    type: string
  *                  disponible:
  *                    type: boolean
- *                  createdAt:
- *                    type: string
- *                    format: date-time
- *                  updatedAt:
- *                    type: string
- *                    format: date-time
  *      responses:
  *          201:
  *              description: Produit créé
@@ -165,12 +161,12 @@ router.post('/', auth, roleCheck(ROLES.ADMIN), upload.single('image'), createPro
  *      security:
  *          - bearerAuth: []
  *      parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: ID du produit
- *         schema:
- *           type: string
+ *        - in: path
+ *          name: id
+ *          required: true
+ *          description: ID du produit
+ *          schema:
+ *            type: string
  *      requestBody:
  *        required: true
  *        content:
@@ -191,31 +187,30 @@ router.post('/', auth, roleCheck(ROLES.ADMIN), upload.single('image'), createPro
  *                    type: boolean
  *      responses:
  *          200:
- *            description: Modification de l'utilisateur réussie
+ *            description: Modification du produit réussie
  *            content:
  *              application/json:
  *                schema:
- *                    type: object
- *                    properties:
- *                      image:
- *                        type: string
- *                        format: binary
- *                      nom:
- *                        type: string
- *                      prix:
- *                        type: number
- *                      categorie:
- *                       type: string
- *                      disponible:
- *                        type: boolean
- *                      createdAt:
- *                        type: string
- *                        format: date-time
- *                      updatedAt:
- *                        type: string
- *                        format: date-time
- *                      token:
- *                        type: string
+ *                  type: object
+ *                  properties:
+ *                    _id:
+ *                      type: string
+ *                    image:
+ *                      type: string
+ *                    nom:
+ *                      type: string
+ *                    prix:
+ *                      type: number
+ *                    categorie:
+ *                      type: string
+ *                    disponible:
+ *                      type: boolean
+ *                    createdAt:
+ *                      type: string
+ *                      format: date-time
+ *                    updatedAt:
+ *                      type: string
+ *                      format: date-time
  *          400:
  *              description: ID invalide
  *          401:
@@ -249,8 +244,10 @@ router.put('/:id', auth, roleCheck(ROLES.ADMIN), upload.single('image'), updateP
  *         description: Produit supprimé avec succès
  *       400:
  *         description: ID invalide
+ *       401:
+ *         description: Token obligatoire
  *       403:
- *         description: Suppression du produit interdite(Oh le petit malin !!!) ou Accès non autorisé pour votre rôle
+ *         description: Accès non autorisé pour votre rôle
  *       404:
  *         description: Produit non trouvé
  *       500:

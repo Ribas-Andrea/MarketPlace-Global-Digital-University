@@ -17,7 +17,7 @@ const ROLES = require('../config/roles');
  * @swagger
  * /api/users:
  *   post:
- *     summary: Inscription
+ *     summary: Inscription d'un utilisateur
  *     tags: [Users]
  *     requestBody:
  *       required: true
@@ -36,18 +36,25 @@ const ROLES = require('../config/roles');
  *                 type: string
  *                 format: password
  *     responses:
- *       200:
- *         description: Authentification réussie
+ *       201:
+ *         description: Utilisateur créé avec succès
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
+ *                 _id:
+ *                   type: string
  *                 username:
  *                   type: string
  *                   format: email
  *                 role:
  *                   type: string
+ *                   enum:
+ *                     - administrateur
+ *                     - accueil
+ *                     - preparateur
+ *                     - client
  *                 createdAt:
  *                   type: string
  *                   format: date-time
@@ -55,11 +62,11 @@ const ROLES = require('../config/roles');
  *                   type: string
  *                   format: date-time
  *       400:
- *         description: Authentification échouée (Email, password et rôle obligatoires, mot de passe trop faible ou compte déjà existant)
+ *         description: Email et password obligatoires, mot de passe trop faible ou compte déjà existant
  *       500:
  *         description: Erreur serveur
  */
-router.post('/', register);
+router.post('/', body('username').isEmail().withMessage('Le username doit être une adresse email'), register);
 
 /**
  * @swagger
@@ -71,29 +78,37 @@ router.post('/', register);
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Affichage de la liste des utilisateurs réussie
+ *         description: Liste des utilisateurs récupérée avec succès
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   _id:
- *                     type: string
- *                   username:
- *                     type: string
- *                     format: email
- *                   role:
- *                     type: string
- *                   createdAt:
- *                     type: string
- *                     format: date-time
- *                   updatedAt:
- *                     type: string
- *                     format: date-time
- *                   token:
- *                     type: string
+ *               type: object
+ *               properties:
+ *                 users:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                       username:
+ *                         type: string
+ *                         format: email
+ *                       role:
+ *                         type: string
+ *                         enum:
+ *                           - administrateur
+ *                           - accueil
+ *                           - preparateur
+ *                           - client
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time
+ *       401:
+ *         description: Token obligatoire
  *       403:
  *         description: Accès non autorisé pour votre rôle
  *       500:
@@ -118,29 +133,37 @@ router.get('/', auth, roleCheck(ROLES.ADMIN), getUsers);
  *           type: string
  *     responses:
  *       200:
- *         description: Affichage de l'utilisateur réussi
+ *         description: Utilisateur récupéré avec succès
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 _id:
- *                   type: string
- *                 username:
- *                   type: string
- *                   format: email
- *                 role:
- *                   type: string
- *                 createdAt:
- *                   type: string
- *                   format: date-time
- *                 updatedAt:
- *                   type: string
- *                   format: date-time
- *                 token:
- *                   type: string
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                     username:
+ *                       type: string
+ *                       format: email
+ *                     role:
+ *                       type: string
+ *                       enum:
+ *                         - administrateur
+ *                         - accueil
+ *                         - preparateur
+ *                         - client
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
  *       400:
  *         description: ID invalide
+ *       401:
+ *         description: Token obligatoire
  *       403:
  *         description: Accès non autorisé pour votre rôle
  *       404:
@@ -154,7 +177,7 @@ router.get('/:id', auth, roleCheck(ROLES.ADMIN), getUser);
  * @swagger
  * /api/users/login:
  *   post:
- *     summary: Connexion
+ *     summary: Connexion d'un utilisateur
  *     tags: [Users]
  *     requestBody:
  *       required: true
@@ -182,12 +205,31 @@ router.get('/:id', auth, roleCheck(ROLES.ADMIN), getUser);
  *               properties:
  *                 token:
  *                   type: string
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                     username:
+ *                       type: string
+ *                       format: email
+ *                     role:
+ *                       type: string
+ *                       enum:
+ *                         - administrateur
+ *                         - accueil
+ *                         - preparateur
+ *                         - client
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
  *       400:
- *         description: Email, password et role obligatoire ou Identifiant Invalides
- *       403:
- *         description: Accès non autorisé pour votre rôle
+ *         description: Email, password obligatoires ou identifiants invalides
  *       500:
- *         description: Erreur Serveur
+ *         description: Erreur serveur
  */
 router.post('/login', body('username').isEmail(), login);
 
@@ -218,9 +260,14 @@ router.post('/login', body('username').isEmail(), login);
  *                 format: password
  *               role:
  *                 type: string
+ *                 enum:
+ *                   - administrateur
+ *                   - accueil
+ *                   - preparateur
+ *                   - client
  *     responses:
  *       200:
- *         description: Modification de l'utilisateur réussie
+ *         description: Utilisateur modifié avec succès
  *         content:
  *           application/json:
  *             schema:
@@ -231,23 +278,25 @@ router.post('/login', body('username').isEmail(), login);
  *                 username:
  *                   type: string
  *                   format: email
- *                 password:
- *                   type: string
- *                   format: password
  *                 role:
  *                   type: string
+ *                   enum:
+ *                     - administrateur
+ *                     - accueil
+ *                     - preparateur
+ *                     - client
  *                 createdAt:
  *                   type: string
  *                   format: date-time
  *                 updatedAt:
  *                   type: string
  *                   format: date-time
- *                 token:
- *                   type: string
  *       400:
  *         description: ID invalide ou rôle invalide
+ *       401:
+ *         description: Token obligatoire
  *       403:
- *         description: Modification du nom d'utilisateur interdite ou Accès non autorisé pour votre rôle
+ *         description: Modification du nom d'utilisateur interdite ou accès non autorisé pour votre rôle
  *       404:
  *         description: Utilisateur non trouvé
  *       500:
@@ -272,11 +321,13 @@ router.put('/:id', auth, roleCheck(ROLES.ADMIN), updateUser);
  *           type: string
  *     responses:
  *       200:
- *         description: Supression de l'utilisateur réussie
+ *         description: Utilisateur supprimé avec succès
  *       400:
  *         description: ID invalide
+ *       401:
+ *         description: Token obligatoire
  *       403:
- *         description: Modification du nom d'utilisateur interdite(Oh le petit malin !!!) ou Accès non autorisé pour votre rôle
+ *         description: Accès non autorisé pour votre rôle
  *       404:
  *         description: Utilisateur non trouvé
  *       500:

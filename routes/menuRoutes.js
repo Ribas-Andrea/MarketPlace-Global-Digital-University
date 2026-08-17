@@ -36,7 +36,6 @@ const ROLES = require('../config/roles');
  *                            type: string
  *                          imageBurger:
  *                            type: string
- *                            format: binary
  *                          nom:
  *                            type: string
  *                          prix:
@@ -101,7 +100,6 @@ router.get('/', getMenus);
  *                          type: string
  *                        imageBurger:
  *                          type: string
- *                          format: binary
  *                        nom:
  *                          type: string
  *                        prix:

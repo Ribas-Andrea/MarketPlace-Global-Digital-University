@@ -17,6 +17,21 @@ exports.getOrders = async (req, res) => {
   }
 };
 
+exports.getOrdersPreparateur = async (req, res) => {
+  try {
+    const orders = await Order.find({ status: 'en_attente' }).sort({
+      heureLivraison: 1,
+      _id: 1
+    });
+
+    res.status(200).json({ orders });
+  } catch (err) {
+    res.status(500).json({
+      error: 'Erreur lors de la récupération des commandes à préparer'
+    });
+  }
+};
+
 exports.getOrder = async (req, res) => {
   try {
     const { id } = req.params;
@@ -26,6 +41,24 @@ exports.getOrder = async (req, res) => {
     const order = await Order.findById(id);
     if (!order) return res.status(404).json({ error: 'Commande non trouvée' });
 
+    if (
+      req.user.role === 'client' &&
+      order.user.toString() !== req.user.userId
+    ) {
+      return res.status(403).json({
+        error: 'Vous ne pouvez consulter que vos propres commandes'
+      });
+    }
+
+    if (
+      req.user.role === 'preparateur' &&
+      order.status !== 'en_attente'
+    ) {
+      return res.status(403).json({
+        error: 'Le préparateur ne peut consulter que les commandes à préparer'
+      });
+    }
+
     res.status(200).json({ order });
   } catch (err) {
     res.status(500).json({ error: 'Erreur lors de la récupération de la commande' });
@@ -34,6 +67,7 @@ exports.getOrder = async (req, res) => {
 
 exports.createOrder = async (req, res) => {
   try {
+    const { heureLivraison } = req.body;
     let articles = [];
     for (let i = 0; i < req.body.articles.length; i++) {
       const { type, id_element, quantite } = req.body.articles[i];
@@ -67,7 +101,9 @@ exports.createOrder = async (req, res) => {
     }
 
     const order = new Order({
-      articles: articles
+      articles,
+      heureLivraison,
+      user: req.user.userId
     });
 
     const savedOrder = await order.save();

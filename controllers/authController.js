@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const mongoose = require('mongoose');
 const passwordValidator = require('password-validator');
+const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const ROLES = require('../config/roles');
@@ -10,6 +11,11 @@ exports.register = async (req, res) => {
   try {
     const { username, password } = req.body;
     if (!username || !password) return res.status(400).json({ message: 'Email et password obligatoire' });
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
     const schema = new passwordValidator();
     schema.is().min(8).has().uppercase().has().digits().has().not().spaces;

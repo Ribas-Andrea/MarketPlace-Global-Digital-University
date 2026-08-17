@@ -1,6 +1,6 @@
 const express = require('express');
 const upload = require('../middleware/multer');
-const { getOrders, getOrder, createOrder, updateOrder, deleteOrder, updateOrderStatus } = require('../controllers/orderController');
+const { getOrders, getOrder, createOrder, updateOrder, deleteOrder, updateOrderStatus, getOrdersPreparateur } = require('../controllers/orderController');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const roleCheck = require('../middleware/roleMiddleware');
@@ -37,6 +37,8 @@ const { loadOrder, validateOrderStatus, canChangeOrderStatus } = require('../mid
  *                        properties:
  *                          _id:
  *                            type: string
+ *                          user:
+ *                            type: string
  *                          articles:
  *                            type: array
  *                            items:
@@ -60,6 +62,9 @@ const { loadOrder, validateOrderStatus, canChangeOrderStatus } = require('../mid
  *                              - en_attente
  *                              - preparee
  *                              - livree
+ *                          heureLivraison:
+ *                            type: string
+ *                            format: date-time
  *                          createdAt:
  *                            type: string
  *                            format: date-time
@@ -71,7 +76,27 @@ const { loadOrder, validateOrderStatus, canChangeOrderStatus } = require('../mid
  *          500:
  *              description: Erreur lors de la récupération des commandes
  */
-router.get('/', auth, getOrders);
+router.get('/', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL), getOrders);
+
+/**
+ * @swagger
+ * /api/orders/preparateur:
+ *   get:
+ *     summary: Afficher les commandes à préparer
+ *     tags: [Commandes]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Liste des commandes à préparer triées par heure de livraison croissante
+ *       401:
+ *         description: Token obligatoire
+ *       403:
+ *         description: Accès réservé aux administrateurs et aux préparateurs
+ *       500:
+ *         description: Erreur lors de la récupération des commandes à préparer
+ */
+router.get('/preparateur', auth, roleCheck(ROLES.ADMIN,ROLES.PREPARATEUR), getOrdersPreparateur);
 
 /**
  * @swagger
@@ -95,12 +120,14 @@ router.get('/', auth, getOrders);
  *              description: ID invalide
  *          401:
  *              description: Token obligatoire
+ *          403:
+ *              description: Accès interdit à cette commande
  *          404:
  *              description: Commande non trouvée
  *          500:
  *              description: Erreur lors de la récupération de la commande
  */
-router.get('/:id', auth, getOrder);
+router.get('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.PREPARATEUR, ROLES.CLIENT), getOrder);
 
 /**
  * @swagger
@@ -115,23 +142,33 @@ router.get('/:id', auth, getOrder);
  *        content:
  *          application/json:
  *            schema:
- *              type: array
- *              items:
- *                type: object
- *                required:
- *                  - type
- *                  - id_element
- *                  - quantite
- *                properties:
- *                  type:
- *                    type: string
- *                    enum:
- *                      - Product
- *                      - Menu
- *                  id_element:
- *                    type: string
- *                  quantite:
- *                    type: number
+ *              type: object
+ *              required:
+ *                - articles
+ *                - heureLivraison
+ *              properties:
+ *                articles:
+ *                  type: array
+ *                  items:
+ *                    type: object
+ *                    required:
+ *                      - type
+ *                      - id_element
+ *                      - quantite
+ *                    properties:
+ *                      type:
+ *                        type: string
+ *                        enum:
+ *                          - Product
+ *                          - Menu
+ *                      id_element:
+ *                        type: string
+ *                      quantite:
+ *                        type: number
+ *                        minimum: 1
+ *                heureLivraison:
+ *                  type: string
+ *                  format: date-time
  *      responses:
  *          201:
  *              description: Commande créée avec succès
@@ -140,7 +177,7 @@ router.get('/:id', auth, getOrder);
  *          401:
  *              description: Token obligatoire
  *          403:
- *              description: Accès interdit, droits administrateur ou accueil requis
+ *              description: Accès interdit, rôle non autorisé
  *          404:
  *              description: Article non trouvé
  *          500:
@@ -169,6 +206,8 @@ router.post('/', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), uplo
  *          application/json:
  *            schema:
  *              type: object
+ *              required:
+ *                - id_element
  *              properties:
  *                type:
  *                  type: string
@@ -179,6 +218,7 @@ router.post('/', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), uplo
  *                  type: string
  *                quantite:
  *                  type: number
+ *                  minimum: 1
  *      responses:
  *          200:
  *              description: Modification de la commande réussie
@@ -187,7 +227,7 @@ router.post('/', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), uplo
  *          401:
  *              description: Token obligatoire
  *          403:
- *              description: Accès interdit, droits administrateur ou accueil requis
+ *              description: Rôle non autorisé ou commande appartenant à un autre client
  *          404:
  *              description: Commande ou article non trouvé
  *          500:
@@ -218,7 +258,7 @@ router.put('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), up
  *          401:
  *              description: Token obligatoire
  *          403:
- *              description: Accès interdit, droits administrateur ou accueil requis
+ *              description: Rôle non autorisé
  *          404:
  *              description: Commande non trouvée
  *          500:
@@ -267,6 +307,8 @@ router.delete('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT),
  *                  properties:
  *                    _id:
  *                      type: string
+ *                    user:
+ *                      type: string
  *                    articles:
  *                      type: array
  *                      items:
@@ -278,6 +320,9 @@ router.delete('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT),
  *                        - en_attente
  *                        - preparee
  *                        - livree
+ *                    heureLivraison:
+ *                      type: string
+ *                      format: date-time
  *                    createdAt:
  *                      type: string
  *                      format: date-time

@@ -20,18 +20,28 @@ const articleSchema = new mongoose.Schema(
     totalArticle: {
       type: Number,
       default: 0
-    }
+    },
+    
   },
   { _id: false }
 );
 
 const orderSchema = new mongoose.Schema(
   {
+     user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
     articles: [articleSchema],
     status: {
       type: String,
       enum: ['brouillon', 'en_attente', 'preparee', 'livree'],
       default: 'brouillon'
+    },
+    heureLivraison: {
+      type: Date,
+      required: true
     }
   },
   { timestamps: true }
