@@ -40,8 +40,9 @@ const orderSchema = new mongoose.Schema(
       default: 'brouillon'
     },
     heureLivraison: {
-      type: Date,
-      required: true
+      type: String,
+      required: true,
+      match: /^([01]\d|2[0-3]):([0-5]\d)$/
     }
   },
   { timestamps: true }

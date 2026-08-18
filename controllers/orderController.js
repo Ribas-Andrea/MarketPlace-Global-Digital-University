@@ -67,10 +67,18 @@ exports.getOrder = async (req, res) => {
 
 exports.createOrder = async (req, res) => {
   try {
-    const { heureLivraison } = req.body;
+    const { heureLivraison, articles: articlesRecus } = req.body;
+
+    if (!articlesRecus || !Array.isArray(articlesRecus) || articlesRecus.length === 0) {
+      return res.status(400).json({
+        error: 'La commande doit contenir au moins un article'
+      });
+    }
+
     let articles = [];
-    for (let i = 0; i < req.body.articles.length; i++) {
-      const { type, id_element, quantite } = req.body.articles[i];
+
+    for (let i = 0; i < articlesRecus.length; i++) {
+      const { type, id_element, quantite } = articlesRecus[i];
 
       let articlePanier;
 
@@ -90,7 +98,9 @@ exports.createOrder = async (req, res) => {
         });
       }
 
-      const totalArticle = Number((articlePanier.prix * quantite).toFixed(2));
+      const totalArticle = Number(
+        (articlePanier.prix * quantite).toFixed(2)
+      );
 
       articles.push({
         type,
@@ -111,6 +121,7 @@ exports.createOrder = async (req, res) => {
     res.status(201).json(savedOrder);
   } catch (err) {
     console.error(err);
+
     res.status(500).json({
       error: 'Erreur lors de la création de la commande'
     });
