@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const Product = require('../models/product');
 const Menu = require('../models/menu');
 const ROLES = require('../config/roles');
+const crypto = require('crypto');
 
 exports.getOrders = async (req, res) => {
   try {
@@ -50,7 +51,7 @@ exports.getOrder = async (req, res) => {
     }
 
     if (
-      req.user.role === ROLES.CLIENT &&
+      req.user?.role === ROLES.CLIENT &&
       order.user?.toString() !== req.user.userId
     ) {
       return res.status(403).json({
@@ -58,9 +59,8 @@ exports.getOrder = async (req, res) => {
       });
     }
 
-
     if (
-      req.user.role === ROLES.PREPARATEUR &&
+      req.user?.role === ROLES.PREPARATEUR &&
       order.status !== 'en_attente'
     ) {
       return res.status(403).json({
@@ -82,33 +82,19 @@ exports.getOrder = async (req, res) => {
 
 exports.getOrderByNumero = async (req, res) => {
   try {
-    const { numeroCommande } = req.params;
-
-    const numero = Number(numeroCommande);
-
-    if (!Number.isInteger(numero) || numero <= 0) {
-      return res.status(400).json({
-        error: 'Numéro de commande invalide'
+    if (req.order) {
+      return res.status(200).json({
+        order: req.order
       });
     }
 
-    const order = await Order.findOne({
-      numeroCommande: numero
-    });
-
-    if (!order) {
-      return res.status(404).json({
-        error: 'Commande non trouvée'
-      });
-    }
-
-    res.status(200).json({
-      order
+    return res.status(404).json({
+      error: 'Commande non trouvée'
     });
   } catch (err) {
     console.error(err);
 
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Erreur lors de la récupération de la commande'
     });
   }
@@ -121,7 +107,14 @@ exports.createOrder = async (req, res) => {
         error: 'Les préparateurs ne peuvent pas créer de commande'
       });
     }
+
     const { heureLivraison, articles: articlesRecus } = req.body;
+
+    if (!heureLivraison) {
+      return res.status(400).json({
+        error: "L'heure de livraison est obligatoire"
+      });
+    }
 
     if (!articlesRecus || !Array.isArray(articlesRecus) || articlesRecus.length === 0) {
       return res.status(400).json({
@@ -129,14 +122,36 @@ exports.createOrder = async (req, res) => {
       });
     }
 
-    const derniereCommande = await Order.findOne().sort({ numeroCommande: -1 });
+    const derniereCommande = await Order.findOne().sort({
+      numeroCommande: -1
+    });
 
-    const numeroCommande = derniereCommande ? derniereCommande.numeroCommande + 1 : 1;
+    const numeroCommande = derniereCommande
+      ? derniereCommande.numeroCommande + 1
+      : 1;
 
-    let articles = [];
+    const articles = [];
 
-    for (let i = 0; i < articlesRecus.length; i++) {
-      const { type, id_element, quantite } = articlesRecus[i];
+    for (const articleRecu of articlesRecus) {
+      const { type, id_element, quantite } = articleRecu;
+
+      if (!id_element) {
+        return res.status(400).json({
+          error: "L'identifiant de l'article est obligatoire"
+        });
+      }
+
+      if (!mongoose.Types.ObjectId.isValid(id_element)) {
+        return res.status(400).json({
+          error: "Identifiant de l'article invalide"
+        });
+      }
+
+      if (!Number.isInteger(quantite) || quantite < 1) {
+        return res.status(400).json({
+          error: 'La quantité doit être un entier supérieur ou égal à 1'
+        });
+      }
 
       let articlePanier;
 
@@ -156,7 +171,9 @@ exports.createOrder = async (req, res) => {
         });
       }
 
-      const totalArticle = Number((articlePanier.prix * quantite).toFixed(2));
+      const totalArticle = Number(
+        (articlePanier.prix * quantite).toFixed(2)
+      );
 
       articles.push({
         type,
@@ -166,20 +183,31 @@ exports.createOrder = async (req, res) => {
       });
     }
 
+    const codeCommande = !req.user
+      ? crypto.randomInt(1000, 10000).toString()
+      : undefined;
+
     const order = new Order({
       articles,
       heureLivraison,
       numeroCommande,
-      user: req.user?.userId
+      user: req.user?.userId,
+      codeCommande
     });
 
     const savedOrder = await order.save();
 
-    res.status(201).json(savedOrder);
+    const response = savedOrder.toObject();
+
+    if (codeCommande) {
+      response.codeCommande = codeCommande;
+    }
+
+    return res.status(201).json(response);
   } catch (err) {
     console.error(err);
 
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Erreur lors de la création de la commande'
     });
   }
@@ -187,31 +215,54 @@ exports.createOrder = async (req, res) => {
 
 exports.updateOrder = async (req, res) => {
   try {
-    const { id } = req.params;
+    let order;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({
-        error: 'ID invalide'
-      });
+    if (req.order) {
+      order = req.order;
+    } else {
+      const { id } = req.params;
+
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({
+          error: 'ID invalide'
+        });
+      }
+
+      order = await Order.findById(id);
+
+      if (!order) {
+        return res.status(404).json({
+          error: 'Commande non trouvée'
+        });
+      }
+
+      if (
+        req.user?.role === ROLES.CLIENT &&
+        order.user?.toString() !== req.user.userId
+      ) {
+        return res.status(403).json({
+          error: 'Vous ne pouvez modifier que vos propres commandes'
+        });
+      }
     }
 
     const { type, id_element, quantite } = req.body;
 
-    const order = await Order.findById(id);
-
-    if (!order) {
-      return res.status(404).json({
-        error: 'Commande non trouvée'
+    if (!id_element) {
+      return res.status(400).json({
+        error: "L'identifiant de l'article est obligatoire"
       });
     }
 
-    if (req.user.role === ROLES.CLIENT && order.user?.toString() !== req.user.userId) {
-      return res.status(403).json({
-        error: 'Vous ne pouvez modifier que vos propres commandes'
+    if (!mongoose.Types.ObjectId.isValid(id_element)) {
+      return res.status(400).json({
+        error: "Identifiant de l'article invalide"
       });
     }
 
-    const article = order.articles.find((a) => a.id_element.toString() === id_element);
+    const article = order.articles.find(
+      (a) => a.id_element.toString() === id_element
+    );
 
     if (!article) {
       return res.status(404).json({
@@ -221,16 +272,28 @@ exports.updateOrder = async (req, res) => {
 
     const nouveauType = type || article.type;
 
+    if (!['Product', 'Menu'].includes(nouveauType)) {
+      return res.status(400).json({
+        error: "Type d'article invalide"
+      });
+    }
+
+    if (quantite !== undefined) {
+      if (!Number.isInteger(quantite) || quantite < 1) {
+        return res.status(400).json({
+          error: 'La quantité doit être un entier supérieur ou égal à 1'
+        });
+      }
+
+      article.quantite = quantite;
+    }
+
     let articlePanier;
 
     if (nouveauType === 'Product') {
       articlePanier = await Product.findById(id_element);
-    } else if (nouveauType === 'Menu') {
-      articlePanier = await Menu.findById(id_element);
     } else {
-      return res.status(400).json({
-        error: "Type d'article invalide"
-      });
+      articlePanier = await Menu.findById(id_element);
     }
 
     if (!articlePanier) {
@@ -239,23 +302,20 @@ exports.updateOrder = async (req, res) => {
       });
     }
 
-    if (type) {
-      article.type = type;
-    }
+    article.type = nouveauType;
+    article.id_element = id_element;
 
-    if (quantite !== undefined) {
-      article.quantite = quantite;
-    }
-
-    article.totalArticle = Number((articlePanier.prix * article.quantite).toFixed(2));
+    article.totalArticle = Number(
+      (articlePanier.prix * article.quantite).toFixed(2)
+    );
 
     const updatedOrder = await order.save();
 
-    res.status(200).json(updatedOrder);
+    return res.status(200).json(updatedOrder);
   } catch (err) {
     console.error(err);
 
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Erreur lors de la modification de la commande'
     });
   }
@@ -266,35 +326,48 @@ exports.updateOrderStatus = async (req, res) => {
     req.order.status = req.body.status;
 
     await req.order.save();
-    res.json(req.order);
+
+    return res.status(200).json(req.order);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Erreur lors de la mise à jour du statut de la commande' });
+
+    return res.status(500).json({
+      error: 'Erreur lors de la mise à jour du statut de la commande'
+    });
   }
 };
 
 exports.deleteOrder = async (req, res) => {
   try {
-    const { id } = req.params;
+    let order;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({
-        error: 'ID invalide'
-      });
-    }
+    if (req.order) {
+      order = req.order;
+    } else {
+      const { id } = req.params;
 
-    const order = await Order.findById(id);
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({
+          error: 'ID invalide'
+        });
+      }
 
-    if (!order) {
-      return res.status(404).json({
-        error: 'Commande non trouvée'
-      });
-    }
+      order = await Order.findById(id);
 
-    if (req.user.role === ROLES.CLIENT && order.user?.toString() !== req.user.userId) {
-      return res.status(403).json({
-        error: 'Vous ne pouvez supprimer que vos propres commandes'
-      });
+      if (!order) {
+        return res.status(404).json({
+          error: 'Commande non trouvée'
+        });
+      }
+
+      if (
+        req.user?.role === ROLES.CLIENT &&
+        order.user?.toString() !== req.user.userId
+      ) {
+        return res.status(403).json({
+          error: 'Vous ne pouvez supprimer que vos propres commandes'
+        });
+      }
     }
 
     await order.deleteOne();

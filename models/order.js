@@ -20,15 +20,14 @@ const articleSchema = new mongoose.Schema(
     totalArticle: {
       type: Number,
       default: 0
-    },
-    
+    }
   },
   { _id: false }
 );
 
 const orderSchema = new mongoose.Schema(
   {
-     user: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false
@@ -48,6 +47,11 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       unique: true,
       required: true
+    },
+    codeCommande: {
+      type: String,
+      required: false,
+      select: false
     }
   },
   { timestamps: true }

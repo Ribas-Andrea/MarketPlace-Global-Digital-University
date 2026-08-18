@@ -7,6 +7,7 @@ const optionalAuth = require('../middleware/optionalAuth');
 const roleCheck = require('../middleware/roleMiddleware');
 const ROLES = require('../config/roles');
 const { loadOrder, validateOrderStatus, canChangeOrderStatus } = require('../middleware/statutMiddleware');
+const orderAccess = require('../middleware/orderAccess');
 
 /**
  * @swagger
@@ -183,7 +184,7 @@ router.get('/preparateur', auth, roleCheck(ROLES.ADMIN,ROLES.PREPARATEUR), getOr
  *       500:
  *         description: Erreur lors de la récupération de la commande
  */
-router.get('/numero/:numeroCommande', getOrderByNumero);
+router.get('/numero/:numeroCommande',optionalAuth,orderAccess,getOrderByNumero);
 
 /**
  * @swagger
@@ -427,6 +428,67 @@ router.put('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), up
 
 /**
  * @swagger
+ * /api/orders/numero/{numeroCommande}:
+ *   put:
+ *     summary: Modifier un article d'une commande avec le numéro et le code secret
+ *     description: Permet à un client non authentifié de modifier sa commande avec son numéro de commande et son code secret. Les utilisateurs authentifiés peuvent également utiliser cette route.
+ *     tags: [Commandes]
+ *     parameters:
+ *       - in: path
+ *         name: numeroCommande
+ *         required: true
+ *         description: Numéro de commande
+ *         schema:
+ *           type: integer
+ *           example: 125
+ *       - in: header
+ *         name: X-Order-Code
+ *         required: false
+ *         description: Code secret de la commande, obligatoire sans token
+ *         schema:
+ *           type: string
+ *           example: "5832"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - id_element
+ *             properties:
+ *               type:
+ *                 type: string
+ *                 enum:
+ *                   - Product
+ *                   - Menu
+ *                 example: Product
+ *               id_element:
+ *                 type: string
+ *                 example: "6a6b442e279ded257bfe5c98"
+ *               quantite:
+ *                 type: integer
+ *                 minimum: 1
+ *                 example: 3
+ *     responses:
+ *       200:
+ *         description: Modification de la commande réussie
+ *       400:
+ *         description: Numéro de commande invalide
+ *       401:
+ *         description: Code de commande obligatoire
+ *       403:
+ *         description: Code de commande incorrect ou accès interdit
+ *       404:
+ *         description: Commande ou article non trouvé
+ *       500:
+ *         description: Erreur lors de la modification de la commande
+ */
+router.put('/numero/:numeroCommande', optionalAuth, orderAccess, upload.none(), updateOrder);
+
+
+/**
+ * @swagger
  * /api/orders/{id}:
  *   delete:
  *     summary: Supprimer une commande
@@ -456,6 +518,45 @@ router.put('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), up
  *         description: Erreur lors de la suppression de la commande
  */
 router.delete('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), deleteOrder);
+
+/**
+ * @swagger
+ * /api/orders/numero/{numeroCommande}:
+ *   delete:
+ *     summary: Supprimer une commande avec le numéro et le code secret
+ *     description: Permet à un client non authentifié de supprimer sa commande avec son numéro de commande et son code secret.
+ *     tags: [Commandes]
+ *     parameters:
+ *       - in: path
+ *         name: numeroCommande
+ *         required: true
+ *         description: Numéro de commande
+ *         schema:
+ *           type: integer
+ *           example: 125
+ *       - in: header
+ *         name: X-Order-Code
+ *         required: false
+ *         description: Code secret de la commande, obligatoire sans token
+ *         schema:
+ *           type: string
+ *           example: "5832"
+ *     responses:
+ *       200:
+ *         description: Commande supprimée avec succès
+ *       400:
+ *         description: Numéro de commande invalide
+ *       401:
+ *         description: Code de commande obligatoire
+ *       403:
+ *         description: Code de commande incorrect ou accès interdit
+ *       404:
+ *         description: Commande non trouvée
+ *       500:
+ *         description: Erreur lors de la suppression de la commande
+ */
+router.delete('/numero/:numeroCommande', optionalAuth, orderAccess, deleteOrder);
+
 
 /**
  * @swagger
