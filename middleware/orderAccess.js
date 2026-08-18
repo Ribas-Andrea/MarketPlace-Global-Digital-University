@@ -5,7 +5,10 @@ const orderAccess = async (req, res, next) => {
   try {
     const { numeroCommande } = req.params;
 
-    if (!Number.isInteger(Number(numeroCommande)) || Number(numeroCommande) <= 0) {
+    if (
+      !Number.isInteger(Number(numeroCommande)) ||
+      Number(numeroCommande) <= 0
+    ) {
       return res.status(400).json({
         error: 'Numéro de commande invalide'
       });
@@ -23,12 +26,18 @@ const orderAccess = async (req, res, next) => {
 
     if (req.user) {
       if (req.user.role === ROLES.CLIENT) {
-        if (!order.user || order.user.toString() !== req.user.userId) {
+        if (
+          !order.user ||
+          order.user.toString() !== req.user.userId
+        ) {
           return res.status(403).json({
             error: 'Vous ne pouvez accéder qu’à vos propres commandes'
           });
         }
-      } else if (req.user.role !== ROLES.ADMIN && req.user.role !== ROLES.ACCUEIL) {
+      } else if (
+        req.user.role !== ROLES.ADMIN &&
+        req.user.role !== ROLES.ACCUEIL
+      ) {
         return res.status(403).json({
           error: 'Vous n’êtes pas autorisé à modifier ou supprimer cette commande'
         });
@@ -38,7 +47,11 @@ const orderAccess = async (req, res, next) => {
       return next();
     }
 
-    const codeCommande = req.headers['x-order-code'];
+    // Le code peut être envoyé :
+    // - dans le header X-Order-Code
+    // - ou dans le FormData avec le champ codeCommande
+    const codeCommande =
+      req.headers['x-order-code'] || req.body?.codeCommande;
 
     if (!codeCommande) {
       return res.status(401).json({
@@ -46,7 +59,7 @@ const orderAccess = async (req, res, next) => {
       });
     }
 
-    if (order.codeCommande !== codeCommande) {
+    if (order.codeCommande !== codeCommande.toString()) {
       return res.status(403).json({
         error: 'Code de commande incorrect'
       });
@@ -58,7 +71,7 @@ const orderAccess = async (req, res, next) => {
   } catch (err) {
     console.error(err);
 
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Erreur lors de la vérification de la commande'
     });
   }
