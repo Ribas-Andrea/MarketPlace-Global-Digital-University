@@ -1,9 +1,8 @@
 const Order = require('../models/order');
 const mongoose = require('mongoose');
-const fs = require('fs');
-const path = require('path');
 const Product = require('../models/product');
 const Menu = require('../models/menu');
+const ROLES = require('../config/roles');
 
 exports.getOrders = async (req, res) => {
   try {
@@ -36,22 +35,32 @@ exports.getOrder = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ error: 'ID invalide' });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        error: 'ID invalide'
+      });
+    }
 
     const order = await Order.findById(id);
-    if (!order) return res.status(404).json({ error: 'Commande non trouvée' });
+
+    if (!order) {
+      return res.status(404).json({
+        error: 'Commande non trouvée'
+      });
+    }
 
     if (
-      req.user.role === 'client' &&
-      order.user.toString() !== req.user.userId
+      req.user.role === ROLES.CLIENT &&
+      order.user?.toString() !== req.user.userId
     ) {
       return res.status(403).json({
         error: 'Vous ne pouvez consulter que vos propres commandes'
       });
     }
 
+
     if (
-      req.user.role === 'preparateur' &&
+      req.user.role === ROLES.PREPARATEUR &&
       order.status !== 'en_attente'
     ) {
       return res.status(403).json({
@@ -59,14 +68,59 @@ exports.getOrder = async (req, res) => {
       });
     }
 
-    res.status(200).json({ order });
+    res.status(200).json({
+      order
+    });
   } catch (err) {
-    res.status(500).json({ error: 'Erreur lors de la récupération de la commande' });
+    console.error(err);
+
+    res.status(500).json({
+      error: 'Erreur lors de la récupération de la commande'
+    });
+  }
+};
+
+exports.getOrderByNumero = async (req, res) => {
+  try {
+    const { numeroCommande } = req.params;
+
+    const numero = Number(numeroCommande);
+
+    if (!Number.isInteger(numero) || numero <= 0) {
+      return res.status(400).json({
+        error: 'Numéro de commande invalide'
+      });
+    }
+
+    const order = await Order.findOne({
+      numeroCommande: numero
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        error: 'Commande non trouvée'
+      });
+    }
+
+    res.status(200).json({
+      order
+    });
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: 'Erreur lors de la récupération de la commande'
+    });
   }
 };
 
 exports.createOrder = async (req, res) => {
   try {
+    if (req.user?.role === ROLES.PREPARATEUR) {
+      return res.status(403).json({
+        error: 'Les préparateurs ne peuvent pas créer de commande'
+      });
+    }
     const { heureLivraison, articles: articlesRecus } = req.body;
 
     if (!articlesRecus || !Array.isArray(articlesRecus) || articlesRecus.length === 0) {
@@ -74,6 +128,10 @@ exports.createOrder = async (req, res) => {
         error: 'La commande doit contenir au moins un article'
       });
     }
+
+    const derniereCommande = await Order.findOne().sort({ numeroCommande: -1 });
+
+    const numeroCommande = derniereCommande ? derniereCommande.numeroCommande + 1 : 1;
 
     let articles = [];
 
@@ -98,9 +156,7 @@ exports.createOrder = async (req, res) => {
         });
       }
 
-      const totalArticle = Number(
-        (articlePanier.prix * quantite).toFixed(2)
-      );
+      const totalArticle = Number((articlePanier.prix * quantite).toFixed(2));
 
       articles.push({
         type,
@@ -113,7 +169,8 @@ exports.createOrder = async (req, res) => {
     const order = new Order({
       articles,
       heureLivraison,
-      user: req.user.userId
+      numeroCommande,
+      user: req.user?.userId
     });
 
     const savedOrder = await order.save();
@@ -132,13 +189,26 @@ exports.updateOrder = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ error: 'ID invalide' });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        error: 'ID invalide'
+      });
+    }
 
     const { type, id_element, quantite } = req.body;
 
     const order = await Order.findById(id);
+
     if (!order) {
-      return res.status(404).json({ error: 'Commande non trouvé' });
+      return res.status(404).json({
+        error: 'Commande non trouvée'
+      });
+    }
+
+    if (req.user.role === ROLES.CLIENT && order.user?.toString() !== req.user.userId) {
+      return res.status(403).json({
+        error: 'Vous ne pouvez modifier que vos propres commandes'
+      });
     }
 
     const article = order.articles.find((a) => a.id_element.toString() === id_element);
@@ -149,15 +219,45 @@ exports.updateOrder = async (req, res) => {
       });
     }
 
-    if (type) article.type = type;
+    const nouveauType = type || article.type;
 
-    if (quantite !== undefined) article.quantite = quantite;
+    let articlePanier;
+
+    if (nouveauType === 'Product') {
+      articlePanier = await Product.findById(id_element);
+    } else if (nouveauType === 'Menu') {
+      articlePanier = await Menu.findById(id_element);
+    } else {
+      return res.status(400).json({
+        error: "Type d'article invalide"
+      });
+    }
+
+    if (!articlePanier) {
+      return res.status(404).json({
+        error: 'Article non trouvé'
+      });
+    }
+
+    if (type) {
+      article.type = type;
+    }
+
+    if (quantite !== undefined) {
+      article.quantite = quantite;
+    }
+
+    article.totalArticle = Number((articlePanier.prix * article.quantite).toFixed(2));
 
     const updatedOrder = await order.save();
-    res.json(updatedOrder);
+
+    res.status(200).json(updatedOrder);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Erreur lors de la modification de la commande' });
+
+    res.status(500).json({
+      error: 'Erreur lors de la modification de la commande'
+    });
   }
 };
 
@@ -177,17 +277,36 @@ exports.deleteOrder = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ error: 'ID invalide' });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        error: 'ID invalide'
+      });
+    }
 
     const order = await Order.findById(id);
+
     if (!order) {
-      return res.status(404).json({ error: 'Commande non trouvée' });
+      return res.status(404).json({
+        error: 'Commande non trouvée'
+      });
+    }
+
+    if (req.user.role === ROLES.CLIENT && order.user?.toString() !== req.user.userId) {
+      return res.status(403).json({
+        error: 'Vous ne pouvez supprimer que vos propres commandes'
+      });
     }
 
     await order.deleteOne();
-    res.json({ message: 'Commande supprimée avec succès' });
+
+    res.json({
+      message: 'Commande supprimée avec succès'
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Erreur lors de la suppression de la commande' });
+
+    res.status(500).json({
+      error: 'Erreur lors de la suppression de la commande'
+    });
   }
 };
