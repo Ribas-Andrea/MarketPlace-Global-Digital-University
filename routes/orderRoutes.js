@@ -183,7 +183,7 @@ router.get('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.PREPARATEUR
  *          500:
  *              description: Erreur lors de la création de la commande
  */
-router.post('/', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), upload.none(), createOrder);
+router.post('/', upload.none(), createOrder);
 
 /**
  * @swagger
