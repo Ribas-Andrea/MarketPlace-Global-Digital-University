@@ -246,7 +246,12 @@ exports.updateOrder = async (req, res) => {
       }
     }
 
-    const { type, id_element, quantite } = req.body;
+    const { type, id_element } = req.body;
+
+    const quantite =
+      req.body.quantite !== undefined
+        ? Number(req.body.quantite)
+        : undefined;
 
     if (!id_element) {
       return res.status(400).json({
@@ -278,7 +283,7 @@ exports.updateOrder = async (req, res) => {
       });
     }
 
-    if (quantite !== undefined) {
+    if (req.body.quantite !== undefined) {
       if (!Number.isInteger(quantite) || quantite < 1) {
         return res.status(400).json({
           error: 'La quantité doit être un entier supérieur ou égal à 1'
