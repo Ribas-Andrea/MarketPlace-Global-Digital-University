@@ -19,7 +19,7 @@ const options = {
         }
       }
     },
-    servers: [{ url: 'https://marketplace-seven-steel.vercel.app/api' }] // mettre url vercel
+    servers: [{ url: 'https://marketplace-seven-steel.vercel.app' }]
   },
   apis: ['./routes/*.js']
 };
