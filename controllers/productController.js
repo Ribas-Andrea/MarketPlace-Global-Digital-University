@@ -71,8 +71,8 @@ exports.createProduct = async (req, res) => {
 
     if (process.env.NODE_ENV === 'production') {
       const result = await new Promise((resolve, reject) => {
-        console.log(cloudinary.uploader);
-        const stream = cloudinary.uploader.upload_stream(
+        console.log(cloudinary);
+        const stream = await cloudinary.uploader.upload_stream(
           {
             folder: `products/${categorie}`
           },
