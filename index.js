@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const setupSwagger = require('./swaggerConfig');
+const connectCloudinary = require('./config/cloudinary');
 
 const app = express();
 
@@ -26,6 +27,10 @@ app.use(express.static('uploads'));
 
 if (process.env.NODE_ENV !== 'test') {
   connectDB();
+}
+
+if (process.env.VERCEL) {
+  connectCloudinary();
 }
 
 app.use('/api/products', require('./routes/productRoutes'));

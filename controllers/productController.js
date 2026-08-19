@@ -63,6 +63,11 @@ exports.createProduct = async (req, res) => {
 
     const image = `${categorie}/${req.file.filename}`;
 
+    const uploadImages = async () => {
+      const result = await cloudinary.uploader.upload(image);
+      console.log(result);
+    }
+
     if (!nom) return res.status(400).json({ error: 'Nom obligatoire' });
 
     if (!prix) return res.status(400).json({ error: 'Prix obligatoire' });
