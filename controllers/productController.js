@@ -53,8 +53,10 @@ exports.createProduct = async (req, res) => {
       return res.status(400).json({ error: 'Nom obligatoire' });
     }
 
-    if (!prix) {
-      return res.status(400).json({ error: 'Prix obligatoire' });
+    if (prix === undefined || prix === null || prix === '' || isNaN(prix) || Number(prix) <= 0) {
+      return res.status(400).json({
+        error: 'Prix invalide'
+      });
     }
 
     if (!categorie) {
@@ -178,10 +180,7 @@ exports.updateProduct = async (req, res) => {
           fs.mkdirSync(dossier, { recursive: true });
         }
 
-        const nouveauChemin = path.join(
-          dossier,
-          req.file.filename
-        );
+        const nouveauChemin = path.join(dossier, req.file.filename);
 
         fs.renameSync(req.file.path, nouveauChemin);
 
