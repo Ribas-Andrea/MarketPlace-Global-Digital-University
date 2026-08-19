@@ -2,6 +2,7 @@ const Product = require('../models/product');
 const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
+const cloudinary = require('../config/cloudinary');
 
 exports.getProducts = async (req, res) => {
   try {
@@ -48,31 +49,59 @@ exports.createProduct = async (req, res) => {
       return res.status(400).json({ error: 'Image obligatoire' });
     }
 
-    if (!categorie) return res.status(400).json({ error: 'Catégorie obligatoire' });
-
-    const dossier = `uploads/${categorie}`;
-
-    if (!fs.existsSync(dossier)) {
-      fs.mkdirSync(dossier, { recursive: true });
+    if (!nom) {
+      return res.status(400).json({ error: 'Nom obligatoire' });
     }
 
-    const ancienChemin = req.file.path;
-    const nouveauChemin = path.join(dossier, req.file.filename);
-
-    fs.renameSync(ancienChemin, nouveauChemin);
-
-    const image = `${categorie}/${req.file.filename}`;
-
-    const uploadImages = async () => {
-      const result = await cloudinary.uploader.upload(image);
-      console.log(result);
+    if (!prix) {
+      return res.status(400).json({ error: 'Prix obligatoire' });
     }
 
-    if (!nom) return res.status(400).json({ error: 'Nom obligatoire' });
+    if (!categorie) {
+      return res.status(400).json({ error: 'Catégorie obligatoire' });
+    }
 
-    if (!prix) return res.status(400).json({ error: 'Prix obligatoire' });
+    if (disponible === undefined) {
+      return res.status(400).json({
+        error: 'Disponibilité obligatoire'
+      });
+    }
 
-    if (disponible === undefined) return res.status(400).json({ error: 'Disponibilité obligatoire' });
+    let image;
+
+    if (process.env.NODE_ENV === 'production') {
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: `products/${categorie}`
+          },
+          (error, result) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(result);
+            }
+          }
+        );
+
+        stream.end(req.file.buffer);
+      });
+
+      image = result.secure_url;
+    } else {
+      const dossier = `uploads/${categorie}`;
+
+      if (!fs.existsSync(dossier)) {
+        fs.mkdirSync(dossier, { recursive: true });
+      }
+
+      const ancienChemin = req.file.path;
+      const nouveauChemin = path.join(dossier, req.file.filename);
+
+      fs.renameSync(ancienChemin, nouveauChemin);
+
+      image = `${categorie}/${req.file.filename}`;
+    }
 
     const product = new Product({
       image,
@@ -83,10 +112,14 @@ exports.createProduct = async (req, res) => {
     });
 
     const savedProduct = await product.save();
+
     res.status(201).json(savedProduct);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Erreur lors de la création du produit' });
+
+    res.status(500).json({
+      error: 'Erreur lors de la création du produit'
+    });
   }
 };
 
@@ -94,35 +127,77 @@ exports.updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ error: 'ID invalide' });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: 'ID invalide' });
+    }
 
     const { nom, prix, categorie, disponible } = req.body;
 
     const product = await Product.findById(id);
+
     if (!product) {
-      return res.status(404).json({ error: 'Produit non trouvé' });
-    }
-
-    let image;
-
-    if (req.file) {
-      image = `${categorie || product.categorie}/${req.file.filename}`;
+      return res.status(404).json({
+        error: 'Produit non trouvé'
+      });
     }
 
     if (nom) product.nom = nom;
     if (prix) product.prix = prix;
-
     if (categorie) product.categorie = categorie;
 
-    if (image) product.image = image;
+    if (disponible !== undefined) {
+      product.disponible = disponible;
+    }
 
-    if (disponible !== undefined) product.disponible = disponible;
+    if (req.file) {
+      const nouvelleCategorie = categorie || product.categorie;
+
+      if (process.env.NODE_ENV === 'production') {
+        const result = await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            {
+              folder: `products/${nouvelleCategorie}`
+            },
+            (error, result) => {
+              if (error) {
+                reject(error);
+              } else {
+                resolve(result);
+              }
+            }
+          );
+
+          stream.end(req.file.buffer);
+        });
+
+        product.image = result.secure_url;
+      } else {
+        const dossier = `uploads/${nouvelleCategorie}`;
+
+        if (!fs.existsSync(dossier)) {
+          fs.mkdirSync(dossier, { recursive: true });
+        }
+
+        const nouveauChemin = path.join(
+          dossier,
+          req.file.filename
+        );
+
+        fs.renameSync(req.file.path, nouveauChemin);
+
+        product.image = `${nouvelleCategorie}/${req.file.filename}`;
+      }
+    }
 
     const updatedProduct = await product.save();
+
     res.json(updatedProduct);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Erreur lors de la modification du produit' });
+
+    res.status(500).json({
+      error: 'Erreur lors de la modification du produit'
+    });
   }
 };
 
@@ -130,23 +205,36 @@ exports.deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ error: 'ID invalide' });
-
-    const product = await Product.findById(id);
-    if (!product) {
-      return res.status(404).json({ error: 'Produit non trouvé' });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: 'ID invalide' });
     }
 
-    const cheminImage = path.join('uploads', product.image);
+    const product = await Product.findById(id);
 
-    if (fs.existsSync(cheminImage)) {
-      fs.unlinkSync(cheminImage);
+    if (!product) {
+      return res.status(404).json({
+        error: 'Produit non trouvé'
+      });
+    }
+
+    if (process.env.NODE_ENV !== 'production') {
+      const cheminImage = path.join('uploads', product.image);
+
+      if (fs.existsSync(cheminImage)) {
+        fs.unlinkSync(cheminImage);
+      }
     }
 
     await product.deleteOne();
-    res.json({ message: 'Produit supprimé avec succès' });
+
+    res.json({
+      message: 'Produit supprimé avec succès'
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Erreur lors de la suppression du produit' });
+
+    res.status(500).json({
+      error: 'Erreur lors de la suppression du produit'
+    });
   }
 };
