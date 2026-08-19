@@ -29,10 +29,6 @@ if (process.env.NODE_ENV !== 'test') {
   connectDB();
 }
 
-// if (process.env.VERCEL) {
-//   connectCloudinary();
-// }
-
 app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/menus', require('./routes/menuRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
