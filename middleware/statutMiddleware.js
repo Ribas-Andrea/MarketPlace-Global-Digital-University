@@ -2,10 +2,33 @@ const Order = require('../models/order');
 const { STATUS, permissionsStatus } = require('../config/statuts');
 
 async function loadOrder(req, res, next) {
-  const order = await Order.findById(req.params.id);
-  if (!order) return res.status(404).json({ error: 'Commande introuvable' });
-  req.order = order;
-  next();
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        error: 'ID invalide'
+      });
+    }
+
+    const order = await Order.findById(id);
+
+    if (!order) {
+      return res.status(404).json({
+        error: 'Commande introuvable'
+      });
+    }
+
+    req.order = order;
+
+    next();
+  } catch (err) {
+    console.error(err);
+
+    return res.status(500).json({
+      error: 'Erreur lors de la récupération de la commande'
+    });
+  }
 }
 
 function validateOrderStatus(req, res, next) {
