@@ -184,8 +184,6 @@ exports.updateMenu = async (req, res) => {
     if (nom) {
       menu.nom = nom;
     }
-
-    if (prix !== undefined) {
     if (prix !== undefined && prix !== '') {
       if (isNaN(prix) || Number(prix) <= 0) {
         return res.status(400).json({
