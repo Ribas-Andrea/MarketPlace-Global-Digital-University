@@ -186,13 +186,13 @@ exports.updateMenu = async (req, res) => {
     }
 
     if (prix !== undefined) {
-      if (prix === '' || isNaN(prix) || Number(prix) <= 0) {
+    if (prix !== undefined && prix !== '') {
+      if (isNaN(prix) || Number(prix) <= 0) {
         return res.status(400).json({
           error: 'Prix invalide'
         });
       }
-
-      menu.prix = prix;
+      menu.prix = Number(prix);
     }
 
     if (categorie) {
