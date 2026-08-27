@@ -321,7 +321,7 @@ router.put('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), up
  *       500:
  *         description: Erreur lors de la modification de la commande
  */
-router.put('/numero/:numeroCommande', optionalAuth, upload.none(), orderAccess, updateOrder);
+router.put('/numero/:numeroCommande', optionalAuth, orderAccess, updateOrder);
 
 /**
  * @swagger
@@ -394,7 +394,7 @@ router.delete('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT),
  *       500:
  *         description: Erreur lors de la suppression de la commande
  */
-router.delete('/numero/:numeroCommande', optionalAuth, upload.none(), orderAccess, deleteOrder);
+router.delete('/numero/:numeroCommande', optionalAuth, orderAccess, deleteOrder);
 
 /**
  * @swagger
