@@ -139,11 +139,12 @@ router.get('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.PREPARATEUR
  *              items:
  *                type: object
  *                required:
- *                  - heureLivraison
  *                  - type
  *                  - id_element
  *                  - quantite
  *                properties:
+ *                  heureLivraison : 
+ *                    type: string
  *                  type:
  *                    type: string
  *                    enum:
