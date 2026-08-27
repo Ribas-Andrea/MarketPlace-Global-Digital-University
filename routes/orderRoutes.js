@@ -134,9 +134,12 @@ router.get('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.PREPARATEUR
  *          application/json:
  *            schema:
  *              type: array
+ *              required:
+ *                - heureLivraison
  *              items:
  *                type: object
  *                required:
+ *                  - heureLivraison
  *                  - type
  *                  - id_element
  *                  - quantite
