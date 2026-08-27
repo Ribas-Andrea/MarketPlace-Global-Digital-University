@@ -133,32 +133,40 @@ router.get('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.PREPARATEUR
  *        content:
  *          application/json:
  *            schema:
- *              type: array
+ *              type: object
  *              required:
- *                - heureLivraison
- *              items:
- *                type: object
- *                required:
- *                  - type
- *                  - id_element
- *                  - quantite
- *                properties:
- *                  heureLivraison:
- *                    type: string
- *                  type:
- *                    type: string
- *                    enum:
- *                      - Product
- *                      - Menu
- *                  id_element:
- *                    type: string
- *                  quantite:
- *                    type: number
+ *                 - heureLivraison
+ *                 - articles
+ *              properties:
+ *                 heureLivraison:
+ *                   type: string
+ *                   example: "12:30"
+ *                 articles:
+ *                   type: array
+ *                   minItems: 1
+ *                   items:
+ *                     type: Object
+ *                     required:
+ *                       - type
+ *                       - id_element
+ *                       - quantite
+ *                     properties:
+ *                       type:
+ *                         type: string
+ *                         enum:
+ *                           - Product
+ *                           - Menu
+ *                       id_element:
+ *                         type: string
+ *                         example: "64f123456789abcdef123456"
+ *                       quantite:
+ *                         type: integer
+ *                         minimum: 1
  *      responses:
  *          201:
  *              description: Commande créée avec succès
  *          400:
- *              description: Type d'article invalide
+ *              description: Données de commande invalides
  *          401:
  *              description: Token obligatoire
  *          403:
