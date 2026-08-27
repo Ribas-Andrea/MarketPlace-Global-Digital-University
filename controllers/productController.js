@@ -144,13 +144,13 @@ exports.updateProduct = async (req, res) => {
     }
 
     if (nom) product.nom = nom;
-    if (prix !== undefined) {
-      if (prix === '' || isNaN(prix) || Number(prix) <= 0) {
+    if (prix !== undefined && prix !== '') {
+      if (isNaN(prix) || Number(prix) <= 0) {
         return res.status(400).json({
           error: 'Prix invalide'
         });
       }
-      product.prix = prix;
+      product.prix = Number(prix);
     }
     if (categorie) product.categorie = categorie;
 
