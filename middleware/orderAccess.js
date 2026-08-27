@@ -51,7 +51,7 @@ const orderAccess = async (req, res, next) => {
     // - dans le header X-Order-Code
     // - ou dans le FormData avec le champ codeCommande
     const codeCommande =
-      req.headers['x-order-code'] || req.body?.codeCommande;
+      req.headers['codeCommande'] || req.body?.codeCommande;
 
     if (!codeCommande) {
       return res.status(401).json({

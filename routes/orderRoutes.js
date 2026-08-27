@@ -69,7 +69,11 @@ router.get('/preparateur', auth, roleCheck(ROLES.ADMIN, ROLES.PREPARATEUR), getO
  * /api/orders/numero/{numeroCommande}:
  *   get:
  *     summary: Afficher une commande avec son numéro
- *     description: Permet de retrouver une commande à partir de son numéro. Un client non authentifié peut accéder à sa commande avec le numéro et le code secret.
+ *     description: |
+ *       Permet de retrouver une commande à partir de son numéro.
+ *       Un utilisateur non authentifié doit fournir le code de commande
+ *       dans l'en-tête codeCommande.
+ *       Un utilisateur authentifié accède à la commande selon son rôle.
  *     tags: [Commandes]
  *     parameters:
  *       - in: path
@@ -78,12 +82,24 @@ router.get('/preparateur', auth, roleCheck(ROLES.ADMIN, ROLES.PREPARATEUR), getO
  *         description: Numéro de commande
  *         schema:
  *           type: integer
+ *           minimum: 1
  *           example: 125
+ *       - in: header
+ *         name: codeCommande
+ *         required: false
+ *         description: Code secret de la commande, obligatoire pour un utilisateur non authentifié
+ *         schema:
+ *           type: string
+ *           example: "5837"
  *     responses:
  *       200:
  *         description: Commande récupérée avec succès
+ *       400:
+ *         description: Numéro de commande invalide
+ *       401:
+ *         description: Code de commande obligatoire
  *       403:
- *         description: Code secret invalide ou accès interdit
+ *         description: Code de commande incorrect ou accès interdit
  *       404:
  *         description: Commande non trouvée
  *       500:
@@ -247,7 +263,10 @@ router.put('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), up
  * /api/orders/numero/{numeroCommande}:
  *   put:
  *     summary: Modifier un article d'une commande avec son numéro
- *     description: Permet de modifier un article d'une commande à partir du numéro de commande. Un client non authentifié peut utiliser son code secret.
+ *     description: |
+ *       Permet de modifier un article d'une commande à partir de son numéro.
+ *       Un utilisateur non authentifié doit fournir le code de commande
+ *       dans l'en-tête codeCommande.
  *     tags: [Commandes]
  *     parameters:
  *       - in: path
@@ -256,7 +275,15 @@ router.put('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), up
  *         description: Numéro de commande
  *         schema:
  *           type: integer
+ *           minimum: 1
  *           example: 125
+ *       - in: header
+ *         name: codeCommande
+ *         required: false
+ *         description: Code secret de la commande, obligatoire pour un utilisateur non authentifié
+ *         schema:
+ *           type: string
+ *           example: "5837"
  *     requestBody:
  *       required: true
  *       content:
@@ -271,6 +298,7 @@ router.put('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), up
  *                 enum:
  *                   - Product
  *                   - Menu
+ *                 description: Type du nouvel article
  *                 example: Product
  *               id_element:
  *                 type: string
@@ -279,6 +307,7 @@ router.put('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), up
  *               quantite:
  *                 type: integer
  *                 minimum: 1
+ *                 description: Nouvelle quantité de l'article
  *                 example: 2
  *     responses:
  *       200:
@@ -286,7 +315,7 @@ router.put('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), up
  *       400:
  *         description: Données invalides ou identifiant invalide
  *       403:
- *         description: Code secret invalide ou accès interdit
+ *         description: Code de commande incorrect ou accès interdit
  *       404:
  *         description: Commande ou article non trouvé
  *       500:
@@ -332,7 +361,10 @@ router.delete('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT),
  * /api/orders/numero/{numeroCommande}:
  *   delete:
  *     summary: Supprimer une commande avec son numéro
- *     description: Permet à un client non authentifié de supprimer sa commande avec son numéro et son code secret.
+ *     description: |
+ *       Permet de supprimer une commande à partir de son numéro.
+ *       Un utilisateur non authentifié doit fournir le code de commande
+ *       dans l'en-tête codeCommande.
  *     tags: [Commandes]
  *     parameters:
  *       - in: path
@@ -341,12 +373,22 @@ router.delete('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT),
  *         description: Numéro de commande
  *         schema:
  *           type: integer
+ *           minimum: 1
  *           example: 125
+ *       - in: header
+ *         name: codeCommande
+ *         required: false
+ *         description: Code secret de la commande, obligatoire pour un utilisateur non authentifié
+ *         schema:
+ *           type: string
+ *           example: "5837"
  *     responses:
  *       200:
  *         description: Commande supprimée avec succès
+ *       400:
+ *         description: Numéro de commande invalide
  *       403:
- *         description: Code secret invalide ou accès interdit
+ *         description: Code de commande incorrect ou accès interdit
  *       404:
  *         description: Commande non trouvée
  *       500:
