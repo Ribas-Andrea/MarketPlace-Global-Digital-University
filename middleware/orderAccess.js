@@ -48,7 +48,9 @@ const orderAccess = async (req, res, next) => {
     }
 
     const codeCommande =
-      req.headers['codecommande'] || req.body?.codeCommande;
+      req.query.codeCommande ||
+      req.headers['codecommande'] ||
+      req.body?.codeCommande;
 
     if (!codeCommande) {
       return res.status(401).json({
