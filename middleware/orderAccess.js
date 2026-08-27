@@ -47,11 +47,8 @@ const orderAccess = async (req, res, next) => {
       return next();
     }
 
-    // Le code peut être envoyé :
-    // - dans le header X-Order-Code
-    // - ou dans le FormData avec le champ codeCommande
     const codeCommande =
-      req.headers['codeCommande'] || req.body?.codeCommande;
+      req.headers['codecommande'] || req.body?.codeCommande;
 
     if (!codeCommande) {
       return res.status(401).json({
