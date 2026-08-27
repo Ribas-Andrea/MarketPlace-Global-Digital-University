@@ -5,7 +5,7 @@ const connectDB = require('./config/db');
 const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
-const setupSwagger = require('./swaggerConfig');
+const setupSwagger = require('./config/swaggerConfig');
 const connectCloudinary = require('./config/cloudinary');
 
 const app = express();
