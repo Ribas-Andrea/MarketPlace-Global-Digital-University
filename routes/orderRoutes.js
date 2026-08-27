@@ -13,12 +13,14 @@ const { loadOrder, validateOrderStatus, canChangeOrderStatus } = require('../mid
 
 const orderAccess = require('../middleware/orderAccess');
 
+
 /**
  * @swagger
  * tags:
  *  name: Commandes
  *  description: Gestion des commandes
  */
+
 
 /**
  * @swagger
@@ -120,20 +122,47 @@ router.get('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.PREPARATEUR
 
 /**
  * @swagger
- * /api/orders:
- *   post:
- *     summary: Créer une commande
- *     description: Permet de créer une commande depuis une borne sans authentification.
- *     tags: [Commandes]
- *     responses:
- *       201:
- *         description: Commande créée avec succès
- *       400:
- *         description: La commande est invalide
- *       404:
- *         description: Article non trouvé
- *       500:
- *         description: Erreur lors de la création de la commande
+ *  /api/orders:
+ *    post:
+ *      summary: Créer une commande
+ *      tags: [Commandes]
+ *      security:
+ *          - bearerAuth: []
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                type: object
+ *                required:
+ *                  - type
+ *                  - id_element
+ *                  - quantite
+ *                properties:
+ *                  type:
+ *                    type: string
+ *                    enum:
+ *                      - Product
+ *                      - Menu
+ *                  id_element:
+ *                    type: string
+ *                  quantite:
+ *                    type: number
+ *      responses:
+ *          201:
+ *              description: Commande créée avec succès
+ *          400:
+ *              description: Type d'article invalide
+ *          401:
+ *              description: Token obligatoire
+ *          403:
+ *              description: Accès interdit, droits administrateur ou accueil requis
+ *          404:
+ *              description: Article non trouvé
+ *          500:
+ *              description: Erreur lors de la création de la commande
  */
 router.post('/', optionalAuth, upload.none(), createOrder);
 
