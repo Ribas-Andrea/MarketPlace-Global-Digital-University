@@ -1,5 +1,7 @@
+const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
+
 
 const options = {
   definition: {
@@ -26,7 +28,11 @@ const options = {
 const swaggerSpec = swaggerJsDoc(options);
 
 const setupSwagger = (app) => {
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.use(
+    '/api-docs',
+    swaggerUi.serveFiles(swaggerSpec),
+    swaggerUi.setup(swaggerSpec)
+  );
 };
 
 module.exports = setupSwagger;
