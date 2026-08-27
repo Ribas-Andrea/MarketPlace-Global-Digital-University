@@ -20,7 +20,11 @@ const options = {
         }
       }
     },
-    servers: [{ url: 'https://marketplace-seven-steel.vercel.app' }]
+    servers: [  {
+    url: process.env.VERCEL
+      ? 'https://marketplace-seven-steel.vercel.app'
+      : 'http://localhost:3000'
+  }]
   },
   apis: ['./routes/*.js']
 };
