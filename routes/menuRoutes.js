@@ -162,22 +162,44 @@ router.get('/:id', getMenu);
  *                  imageBurger:
  *                    type: string
  *                    format: binary
+ *                    description: "Image obligatoire"
  *                  nom:
  *                    type: string
+ *                    description: "Nom obligatoire"
  *                  prix:
  *                    type: number
+ *                    description: "Prix obligatoire"
  *                  categorie:
  *                    type: string
+ *                    description: "Il s'agit de quoi : burgers, boissons, desserts, encas, frites, salades, sauces, wraps"
+ *                    enum:
+ *                      - burgers
+ *                      - boissons
+ *                      - desserts
+ *                      - encas
+ *                      - frites
+ *                      - salades
+ *                      - sauces
+ *                      - wraps
+ *                    example: "burgers"
  *                  disponible:
  *                    type: boolean
  *                  taille:
  *                    type: string
+ *                    enum:
+ *                      - Best Of
+ *                      - Maxi Best Of
  *                  accompagnement:
  *                    type: string
+ *                    enum:
+ *                      - Frites
+ *                      - Potatoes
  *                  boisson:
  *                    type: string
+ *                    description: "Boisson obligatoire"
  *                  sauce:
  *                    type: string
+ *                    description: "Sauce obligatoire"
  *      responses:
  *          201:
  *              description: Menu créé avec succès
