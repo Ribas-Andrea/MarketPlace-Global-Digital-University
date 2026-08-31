@@ -130,10 +130,13 @@ router.get('/:id', getProduct);
  *                  image:
  *                    type: string
  *                    format: binary
+ *                    description: "Image obligatoire"
  *                  nom:
  *                    type: string
+ *                    description: "Nom obligatoire"
  *                  prix:
  *                    type: number
+ *                    description: "prix obligatoire"
  *                  categorie:
  *                    type: string
  *                    description: "Il s'agit de quoi : burgers, boissons, desserts, encas, frites, salades, sauces, wraps"
