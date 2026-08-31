@@ -12,7 +12,7 @@ const ROLES = require('../config/roles');
  *    name: Users
  *    description: Gestion des utilisateurs
  */
-
+schema.is().min(8).has().uppercase().has().digits().has().not().spaces;
 /**
  * @swagger
  * /api/users:
@@ -35,6 +35,8 @@ const ROLES = require('../config/roles');
  *               password:
  *                 type: string
  *                 format: password
+ *                 description: Le mot de passe doit contenir au moins 8 caractères dont 1 chiffre, 1 majuscule et il ne doit pas y avoir d'espaces
+ *                 example: "test123A"
  *     responses:
  *       201:
  *         description: Utilisateur créé avec succès
