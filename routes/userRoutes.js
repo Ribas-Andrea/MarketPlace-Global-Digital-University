@@ -12,7 +12,7 @@ const ROLES = require('../config/roles');
  *    name: Users
  *    description: Gestion des utilisateurs
  */
-schema.is().min(8).has().uppercase().has().digits().has().not().spaces;
+
 /**
  * @swagger
  * /api/users:
