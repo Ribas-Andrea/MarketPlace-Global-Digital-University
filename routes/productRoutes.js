@@ -137,6 +137,15 @@ router.get('/:id', getProduct);
  *                  categorie:
  *                    type: string
  *                    description: Il s'agit de quoi : burgers, boissons, desserts, encas, frites, salades, sauces, wraps
+ *                    enum:
+ *                      - burgers
+ *                      - boissons
+ *                      - desserts
+ *                      - encas
+ *                      - frites
+ *                      - salades
+ *                      - sauces
+ *                      - wraps
  *                    example: "burgers"
  *                  disponible:
  *                    type: boolean
