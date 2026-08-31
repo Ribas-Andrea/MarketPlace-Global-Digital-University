@@ -187,8 +187,8 @@ router.get('/:id', getMenu);
  *                  taille:
  *                    type: string
  *                    enum:
- *                      - Best Of
- *                      - Maxi Best Of
+ *                      - Menu Best Of
+ *                      - Menu Maxi Best Of
  *                  accompagnement:
  *                    type: string
  *                    enum:
