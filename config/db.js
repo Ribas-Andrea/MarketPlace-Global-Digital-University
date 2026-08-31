@@ -1,4 +1,4 @@
-const { default: mongoose } = require('mongoose');
+const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
@@ -6,6 +6,7 @@ const connectDB = async () => {
     console.log('MongoDB connectée');
   } catch (err) {
     console.error('Erreur MongoDB :', err);
+    throw err;
   }
 };
 
