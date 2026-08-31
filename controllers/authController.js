@@ -18,7 +18,7 @@ exports.register = async (req, res) => {
     }
 
     const schema = new passwordValidator();
-    schema.is().min(8).has().uppercase().has().digits().has().not().spaces;
+    schema.is().min(8).has().uppercase().has().digits().has().not().spaces();
 
     if (!schema.validate(password)) {
       return res.status(400).json({ message: 'Mot de passe trop faible' });
