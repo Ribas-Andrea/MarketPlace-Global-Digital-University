@@ -145,7 +145,7 @@ router.get('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.PREPARATEUR
  * /api/orders:
  *   post:
  *     summary: Créer une commande
- *     description: Crée une commande. L'utilisateur peut être authentifié ou non. Une commande créée sans authentification reçoit un code secret permettant de la retrouver.
+ *     description: Crée une commande. L'utilisateur peut être authentifié ou non. Une commande créée sans authentification reçoit un code secret permettant de la retrouver.Un produit indisponible ne peut pas être ajouter à une commande.
  *     tags: [Commandes]
  *     requestBody:
  *       required: true
@@ -190,7 +190,7 @@ router.get('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.PREPARATEUR
  *       201:
  *         description: Commande créée avec succès
  *       400:
- *         description: Données de commande invalides
+ *         description: Données de commande invalides ou produit indisponible
  *       403:
  *         description: Les préparateurs ne peuvent pas créer de commande
  *       404:
@@ -313,7 +313,7 @@ router.put('/:id', auth, roleCheck(ROLES.ADMIN, ROLES.ACCUEIL, ROLES.CLIENT), up
  *       200:
  *         description: Commande modifiée avec succès
  *       400:
- *         description: Données invalides ou identifiant invalide
+ *         description: Données invalides ou identifiant invalide ou produit indisponible
  *       403:
  *         description: Code de commande incorrect ou accès interdit
  *       404:
