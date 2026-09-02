@@ -56,7 +56,7 @@ function canChangeOrderStatus(req, res, next) {
 
   const rolePermissions = permissionsStatus[role];
   if (!rolePermissions) {
-    return res.status(403).json({ error: 'Rôle non reconnu' });
+    return res.status(403).json({ error: `Le rôle '${role}' n'a pas la permission de changer le statut d'une commande`});
   }
 
   const allowedTransitions = rolePermissions[order.status] || [];
