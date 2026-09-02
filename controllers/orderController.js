@@ -171,6 +171,12 @@ exports.createOrder = async (req, res) => {
         });
       }
 
+      if (!articlePanier.disponible) {
+        return res.status(400).json({
+          error: 'Cet article est actuellement indisponible'
+        });
+      }
+
       const totalArticle = Number(
         (articlePanier.prix * quantite).toFixed(2)
       );
@@ -304,6 +310,12 @@ exports.updateOrder = async (req, res) => {
     if (!articlePanier) {
       return res.status(404).json({
         error: 'Article non trouvé'
+      });
+    }
+
+    if (!articlePanier.disponible) {
+      return res.status(400).json({
+        error: 'Cet article est actuellement indisponible'
       });
     }
 
