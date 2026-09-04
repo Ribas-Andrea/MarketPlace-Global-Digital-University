@@ -161,7 +161,7 @@ exports.createOrder = async (req, res) => {
         articlePanier = await Menu.findById(id_element);
       } else {
         return res.status(400).json({
-          error: "Type d'article invalide"
+          error: "Type d'article invalide, type attenu = Product ou Menu"
         });
       }
 
